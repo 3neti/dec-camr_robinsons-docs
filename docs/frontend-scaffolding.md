@@ -22,43 +22,43 @@ This document provides complete scaffolding for all Vue 3 + Inertia.js pages, co
 ```
 resources/
 ├── js/
-│   ├── Pages/
-│   │   ├── Auth/
-│   │   │   └── Login.vue
-│   │   ├── Dashboard.vue
-│   │   ├── Contacts/
-│   │   │   ├── Index.vue
-│   │   │   └── Edit.vue
-│   │   ├── Logs/
-│   │   │   └── Index.vue
-│   │   └── Settings/
-│   │       └── Index.vue
-│   ├── Components/
-│   │   ├── Layout/
-│   │   │   ├── AppLayout.vue
-│   │   │   └── TopNav.vue
-│   │   ├── SMSComposer/
-│   │   │   ├── RecipientInput.vue
-│   │   │   ├── MessageTextarea.vue
-│   │   │   └── SenderSelect.vue
-│   │   ├── Shared/
-│   │   │   ├── Button.vue
-│   │   │   ├── Input.vue
-│   │   │   ├── Card.vue
-│   │   │   └── ScheduleModal.vue
-│   │   └── Contacts/
-│   │       ├── ContactCard.vue
-│   │       └── GroupCard.vue
-│   ├── Composables/
-│   │   ├── useContacts.ts
-│   │   ├── useSMS.ts
-│   │   ├── useAutocomplete.ts
-│   │   └── useToast.ts
-│   ├── Types/
+│   ├── pages/
+│   │   ├── auth/
+│   │   │   └── login.vue
+│   │   ├── dashboard.vue
+│   │   ├── contacts/
+│   │   │   ├── index.vue
+│   │   │   └── edit.vue
+│   │   ├── logs/
+│   │   │   └── index.vue
+│   │   └── settings/
+│   │       └── index.vue
+│   ├── components/
+│   │   ├── layout/
+│   │   │   ├── app-layout.vue
+│   │   │   └── top-nav.vue
+│   │   ├── sms-composer/
+│   │   │   ├── recipient-input.vue
+│   │   │   ├── message-textarea.vue
+│   │   │   └── sender-select.vue
+│   │   ├── shared/
+│   │   │   ├── button.vue
+│   │   │   ├── input.vue
+│   │   │   ├── card.vue
+│   │   │   └── schedule-modal.vue
+│   │   └── contacts/
+│   │       ├── contact-card.vue
+│   │       └── group-card.vue
+│   ├── composables/
+│   │   ├── use-contacts.ts
+│   │   ├── use-sms.ts
+│   │   ├── use-autocomplete.ts
+│   │   └── use-toast.ts
+│   ├── types/
 │   │   ├── models.ts
 │   │   ├── api.ts
 │   │   └── forms.ts
-│   ├── Utils/
+│   ├── lib/
 │   │   ├── api.ts
 │   │   ├── formatters.ts
 │   │   └── validators.ts
@@ -71,7 +71,7 @@ resources/
 
 ## TypeScript Types
 
-### `resources/js/Types/models.ts`
+### `resources/js/types/models.ts`
 
 ```typescript
 export interface Contact {
@@ -152,7 +152,7 @@ export interface SMSLog {
 }
 ```
 
-### `resources/js/Types/api.ts`
+### `resources/js/types/api.ts`
 
 ```typescript
 import { Contact, Group, ScheduledMessage, SMSLog } from './models'
@@ -210,7 +210,7 @@ export interface ApiError {
 }
 ```
 
-### `resources/js/Types/forms.ts`
+### `resources/js/types/forms.ts`
 
 ```typescript
 export interface SMSComposerForm {
@@ -246,7 +246,7 @@ export interface ScheduleForm {
 
 ## Layouts
 
-### `resources/js/Components/Layout/AppLayout.vue`
+### `resources/js/components/layout/app-layout.vue`
 
 ```vue
 <template>
@@ -264,7 +264,7 @@ import TopNav from './TopNav.vue'
 </script>
 ```
 
-### `resources/js/Components/Layout/TopNav.vue`
+### `resources/js/components/layout/top-nav.vue`
 
 ```vue
 <template>
@@ -392,7 +392,7 @@ import { ref, computed } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
-import type { User } from '@/Types/models'
+import type { User } from '@/types/models'
 
 const page = usePage()
 const user = computed(() => page.props.auth.user as User)
@@ -425,7 +425,7 @@ const mobileLinkClass = (path: string) => {
 
 ## Pages
 
-### `resources/js/Pages/Auth/Login.vue`
+### `resources/js/pages/auth/login.vue`
 
 ```vue
 <template>
@@ -508,7 +508,7 @@ const mobileLinkClass = (path: string) => {
 
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
-import type { LoginForm } from '@/Types/forms'
+import type { LoginForm } from '@/types/forms'
 
 const form = useForm<LoginForm>({
   email: '',
@@ -522,7 +522,7 @@ const submit = () => {
 </script>
 ```
 
-### `resources/js/Pages/Dashboard.vue`
+### `resources/js/pages/dashboard.vue`
 
 ```vue
 <template>
@@ -600,16 +600,16 @@ const submit = () => {
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
-import AppLayout from '@/Components/Layout/AppLayout.vue'
-import Card from '@/Components/Shared/Card.vue'
-import Button from '@/Components/Shared/Button.vue'
-import RecipientInput from '@/Components/SMSComposer/RecipientInput.vue'
-import MessageTextarea from '@/Components/SMSComposer/MessageTextarea.vue'
-import SenderSelect from '@/Components/SMSComposer/SenderSelect.vue'
-import ScheduleModal from '@/Components/Shared/ScheduleModal.vue'
-import { useToast } from '@/Composables/useToast'
-import type { Contact, Group, SenderID } from '@/Types/models'
-import type { SMSComposerForm } from '@/Types/forms'
+import AppLayout from '@/components/layout/app-layout.vue'
+import Card from '@/components/shared/card.vue'
+import Button from '@/components/shared/button.vue'
+import RecipientInput from '@/components/sms-composer/recipient-input.vue'
+import MessageTextarea from '@/components/sms-composer/message-textarea.vue'
+import SenderSelect from '@/components/sms-composer/sender-select.vue'
+import ScheduleModal from '@/components/shared/schedule-modal.vue'
+import { useToast } from '@/composables/use-toast'
+import type { Contact, Group, SenderID } from '@/types/models'
+import type { SMSComposerForm } from '@/types/forms'
 
 interface Props {
   contacts: Contact[]
@@ -654,7 +654,7 @@ const handleScheduleSuccess = () => {
 </script>
 ```
 
-### `resources/js/Pages/Contacts/Index.vue`
+### `resources/js/pages/contacts/index.vue`
 
 ```vue
 <template>
@@ -717,12 +717,12 @@ const handleScheduleSuccess = () => {
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
-import AppLayout from '@/Components/Layout/AppLayout.vue'
-import Button from '@/Components/Shared/Button.vue'
-import Input from '@/Components/Shared/Input.vue'
-import GroupCard from '@/Components/Contacts/GroupCard.vue'
-import ContactCard from '@/Components/Contacts/ContactCard.vue'
-import type { Contact, Group } from '@/Types/models'
+import AppLayout from '@/components/layout/app-layout.vue'
+import Button from '@/components/shared/button.vue'
+import Input from '@/components/shared/input.vue'
+import GroupCard from '@/components/contacts/group-card.vue'
+import ContactCard from '@/components/contacts/contact-card.vue'
+import type { Contact, Group } from '@/types/models'
 
 interface Props {
   contacts: Contact[]
@@ -772,7 +772,7 @@ const handleEditContact = (contact: Contact) => {
 </script>
 ```
 
-### `resources/js/Pages/Logs/Index.vue`
+### `resources/js/pages/logs/index.vue`
 
 ```vue
 <template>
@@ -884,12 +884,12 @@ const handleEditContact = (contact: Contact) => {
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
-import AppLayout from '@/Components/Layout/AppLayout.vue'
-import Card from '@/Components/Shared/Card.vue'
-import Button from '@/Components/Shared/Button.vue'
-import { useToast } from '@/Composables/useToast'
-import type { ScheduledMessage } from '@/Types/models'
-import type { PaginatedResponse } from '@/Types/api'
+import AppLayout from '@/components/layout/app-layout.vue'
+import Card from '@/components/shared/card.vue'
+import Button from '@/components/shared/button.vue'
+import { useToast } from '@/composables/use-toast'
+import type { ScheduledMessage } from '@/types/models'
+import type { PaginatedResponse } from '@/types/api'
 import dayjs from 'dayjs'
 
 interface Props {
@@ -980,7 +980,7 @@ const cancelScheduledMessage = async (id: number) => {
 </script>
 ```
 
-### `resources/js/Pages/Settings/Index.vue`
+### `resources/js/pages/settings/index.vue`
 
 ```vue
 <template>
@@ -1070,11 +1070,11 @@ const cancelScheduledMessage = async (id: number) => {
 <script setup lang="ts">
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import AppLayout from '@/Components/Layout/AppLayout.vue'
-import Card from '@/Components/Shared/Card.vue'
-import Button from '@/Components/Shared/Button.vue'
-import { useToast } from '@/Composables/useToast'
-import type { User, SenderID } from '@/Types/models'
+import AppLayout from '@/components/layout/app-layout.vue'
+import Card from '@/components/shared/card.vue'
+import Button from '@/components/shared/button.vue'
+import { useToast } from '@/composables/use-toast'
+import type { User, SenderID } from '@/types/models'
 
 interface Props {
   user: User
@@ -1107,7 +1107,7 @@ const setDefaultSender = async (id: number) => {
 
 ## Components
 
-### `resources/js/Components/Shared/Button.vue`
+### `resources/js/components/shared/button.vue`
 
 ```vue
 <template>
@@ -1157,7 +1157,7 @@ const classes = computed(() => {
 </script>
 ```
 
-### `resources/js/Components/Shared/Input.vue`
+### `resources/js/components/shared/input.vue`
 
 ```vue
 <template>
@@ -1204,7 +1204,7 @@ const classes = computed(() => {
 </script>
 ```
 
-### `resources/js/Components/Shared/Card.vue`
+### `resources/js/components/shared/card.vue`
 
 ```vue
 <template>
@@ -1220,7 +1220,7 @@ const classes = computed(() => {
 
 ## Composables
 
-### `resources/js/Composables/useToast.ts`
+### `resources/js/composables/use-toast.ts`
 
 ```typescript
 import { ref } from 'vue'
@@ -1258,12 +1258,12 @@ export function useToast() {
 }
 ```
 
-### `resources/js/Composables/useSMS.ts`
+### `resources/js/composables/use-sms.ts`
 
 ```typescript
 import { ref } from 'vue'
 import axios from 'axios'
-import type { SendSMSRequest, SendSMSResponse, ScheduleSMSRequest, ScheduleSMSResponse } from '@/Types/api'
+import type { SendSMSRequest, SendSMSResponse, ScheduleSMSRequest, ScheduleSMSResponse } from '@/types/api'
 
 export function useSMS() {
   const loading = ref(false)
@@ -1308,12 +1308,12 @@ export function useSMS() {
 }
 ```
 
-### `resources/js/Composables/useContacts.ts`
+### `resources/js/composables/use-contacts.ts`
 
 ```typescript
 import { ref, computed } from 'vue'
 import axios from 'axios'
-import type { Contact, Group } from '@/Types/models'
+import type { Contact, Group } from '@/types/models'
 
 export function useContacts() {
   const contacts = ref<Contact[]>([])
@@ -1381,7 +1381,7 @@ export function useContacts() {
 }
 ```
 
-### `resources/js/Composables/useAutocomplete.ts`
+### `resources/js/composables/use-autocomplete.ts`
 
 ```typescript
 import { ref, computed } from 'vue'
@@ -1524,8 +1524,8 @@ createInertiaApp({
   title: (title) => `${title} - ${appName}`,
   resolve: (name) =>
     resolvePageComponent(
-      `./Pages/${name}.vue`,
-      import.meta.glob<DefineComponent>('./Pages/**/*.vue')
+      `./pages/${name}.vue`,
+      import.meta.glob<DefineComponent>('./pages/**/*.vue')
     ),
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })

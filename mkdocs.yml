@@ -51,7 +51,7 @@ nav:
     - Gateway Management: modules/gateway-management.md
     - Meter Management: modules/meter-management.md
     - Building Management: modules/building-management.md
-    - Meter Location: modules/meter-location.md
+    - Meter Location Management: modules/meter-location-management.md
   - Reporting:
     - SAP Report: reports/sap-report.md
     - RAW Report: reports/raw-report.md
@@ -70,6 +70,7 @@ nav:
     - Gateway Device API: api/gateway-device-api.md
     - Load Profile API: api/load-profile-api.md
   - Configuration:
+    - Configuration Overview: configuration.md
     - Environment Setup: configuration/environment.md
     - Email Configuration: configuration/email.md
     - Company & Division: configuration/company-division.md

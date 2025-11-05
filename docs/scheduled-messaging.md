@@ -168,7 +168,7 @@ use App\Models\Group;
 use App\Models\ScheduledMessage;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Propaganistas\LaravelPhone\PhoneNumber;
 
@@ -214,20 +214,23 @@ class ScheduleMessage
         ]);
     }
 
-    public function asController(Request $request): JsonResponse
+    public function rules(): array
     {
-        $validated = $request->validate([
+        return [
             'recipients' => 'required',
             'message' => 'required|string|max:1600',
             'scheduled_at' => 'required|date|after:now',
             'sender_id' => 'nullable|string|max:11',
-        ]);
+        ];
+    }
 
+    public function asController(ActionRequest $request): JsonResponse
+    {
         $scheduledMessage = $this->handle(
-            $validated['recipients'],
-            $validated['message'],
-            $validated['scheduled_at'],
-            $validated['sender_id'] ?? null
+            $request->recipients,
+            $request->message,
+            $request->scheduled_at,
+            $request->sender_id ?? null
         );
 
         return response()->json([
@@ -323,7 +326,7 @@ namespace App\Actions;
 use App\Models\ScheduledMessage;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateScheduledMessage
@@ -362,19 +365,22 @@ class UpdateScheduledMessage
         return $scheduledMessage->fresh();
     }
 
-    public function asController(Request $request, int $id): JsonResponse
+    public function rules(): array
     {
-        $validated = $request->validate([
+        return [
             'message' => 'sometimes|string|max:1600',
             'scheduled_at' => 'sometimes|date|after:now',
             'sender_id' => 'sometimes|string|max:11',
-        ]);
+        ];
+    }
 
+    public function asController(ActionRequest $request, int $id): JsonResponse
+    {
         $scheduledMessage = $this->handle(
             $id,
-            $validated['message'] ?? null,
-            $validated['scheduled_at'] ?? null,
-            $validated['sender_id'] ?? null
+            $request->message ?? null,
+            $request->scheduled_at ?? null,
+            $request->sender_id ?? null
         );
 
         return response()->json($scheduledMessage, 200);
@@ -439,7 +445,7 @@ namespace App\Actions;
 
 use App\Models\ScheduledMessage;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class ListScheduledMessages
@@ -457,7 +463,7 @@ class ListScheduledMessages
         return $query->paginate(20);
     }
 
-    public function asController(Request $request): JsonResponse
+    public function asController(ActionRequest $request): JsonResponse
     {
         $status = $request->query('status', 'all');
         $messages = $this->handle($status);

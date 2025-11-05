@@ -1,7 +1,7 @@
-site_name: Text Commander Documentation
-site_description: Fast-deployable SMS broadcasting system with branded sender ID
-site_url: https://txtcmdr.docs
-site_author: 3neti R&D OPC
+site_name: CAMR Robinsons Documentation
+site_description: Centralized Automated Meter Reading (CAMR) System for Robinsons
+site_url: https://camr-robinsons.docs
+site_author: DEC Corporation
 
 theme:
   name: material
@@ -39,47 +39,50 @@ theme:
 nav:
   - Home: index.md
   - Getting Started:
-    - Quick Start: quick-start.md
-    - Package Architecture: package-architecture.md
-  - Development Plan: development-plan.md
-  - Core Features:
-    - SMS Broadcasting:
-      - SMS Integration: sms-integration.md
-      - Phone Normalization: phone-normalization.md
-    - Scheduled Messaging: scheduled-messaging.md
-    - Blacklist (No-Send List): blacklist-feature.md
-    - Group Management: group-management.md
-    - Contact Management: contact-package.md
-  - API Reference:
-    - API Documentation: api-documentation.md
-    - Interfaces & DTOs: interfaces-and-dtos.md
+    - Overview: overview.md
+    - System Requirements: system-requirements.md
+    - Installation Guide: installation.md
+  - System Architecture:
+    - Application Structure: architecture.md
+    - Technology Stack: technology-stack.md
+    - Data Flow: data-flow.md
+  - Core Modules:
+    - Site Management: modules/site-management.md
+    - Gateway Management: modules/gateway-management.md
+    - Meter Management: modules/meter-management.md
+    - Building Management: modules/building-management.md
+    - Meter Location: modules/meter-location.md
+  - Reporting:
+    - SAP Report: reports/sap-report.md
+    - RAW Report: reports/raw-report.md
+    - Site Report: reports/site-report.md
+    - Consumption Report: reports/consumption-report.md
+    - Demand Report: reports/demand-report.md
+    - Offline Report: reports/offline-report.md
+  - User Management:
+    - User Accounts: user-management.md
+    - Site Access Control: site-access-control.md
+    - Authentication: authentication.md
   - Database:
     - Database Schema: database-schema.md
-  - Backend Architecture:
-    - Backend Services: backend-services.md
     - Models: models.md
-    - Jobs & Commands: jobs-commands.md
-    - Middleware: middleware.md
-  - Controllers:
-    - Controller Scaffolding: controller-scaffolding.md
-  - Frontend:
-    - Frontend Scaffolding: frontend-scaffolding.md
-    - UI/UX Design: ui-ux-design.md
-    - Wireframes: wireframes.md
-  - Testing:
-    - Test Scaffolding: test-scaffolding.md
-  - Third-Party Packages:
-    - Package Overview: packages.md
-  - Security & Compliance:
-    - Security Guide: security.md
-  - Operations:
-    - Jobs, Events & Listeners: events-listeners.md
-    - Notifications: notifications.md
-    - Logging & Monitoring: logging-monitoring.md
-    - DevOps & Deployment: deployment.md
+  - API Reference:
+    - Gateway Device API: api/gateway-device-api.md
+    - Load Profile API: api/load-profile-api.md
+  - Configuration:
+    - Environment Setup: configuration/environment.md
+    - Email Configuration: configuration/email.md
+    - Company & Division: configuration/company-division.md
+    - Configuration Files: configuration/config-files.md
+  - Web Interface:
+    - Web Page Settings: web-settings.md
+    - Custom Branding: branding.md
+  - Maintenance:
+    - Troubleshooting: maintenance/troubleshooting.md
+    - Known Issues: maintenance/known-issues.md
   - Appendices:
-    - Reference Guide: appendices.md
-    - Documentation TODO: TODO-SECTIONS.md
+    - Glossary: appendices/glossary.md
+    - Developer Notes: appendices/developer-notes.md
 
 markdown_extensions:
   - admonition

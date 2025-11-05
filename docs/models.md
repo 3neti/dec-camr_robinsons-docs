@@ -1,355 +1,481 @@
-# Models
+# Eloquent Models
 
-**ORM:** Laravel Eloquent  
-**Namespace:** `App\Models`
+## 📋 Overview
 
-Text Commander uses Eloquent models with relationships, scopes, and static helper methods following Laravel best practices.
+The CAMR system uses Laravel's Eloquent ORM for database interactions. All models extend `Illuminate\Database\Eloquent\Model` and implement activity logging using the Spatie Laravel ActivityLog package.
 
-## Core Models
+## 🏛️ Model Architecture
 
-### User Model
+All models (except `User`) share common characteristics:
+- **Activity Logging:** Uses `LogsActivity` trait from Spatie
+- **Audit Trail:** Tracks create, update, and delete operations
+- **Session Integration:** Logs the user ID from session for audit purposes
+- **Mass Assignment:** Protected via `$fillable` arrays
+- **Timestamps:** Laravel's automatic `created_at` and `updated_at`
 
-**Path:** `app/Models/User.php`  
-**Table:** `users`  
-**Authenticatable:** Yes (Laravel Sanctum)
+### Common Pattern
 
 ```php
-namespace App\Models;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Contracts\Activity;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Sanctum\HasApiTokens;
-
-class User extends Authenticatable
+class ExampleModel extends Model
 {
-    use HasApiTokens;
-
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
-
-    // Relationships
-    public function groups()
+    use LogsActivity;
+    
+    // Set causer_id from session for activity log
+    public function tapActivity(Activity $activity, string $eventName)
     {
-        return $this->hasMany(Group::class);
+        $activity->causer_id = Session::get('loginID');
     }
+    
+    protected $table = 'table_name';
+    protected $primaryKey = 'id_column';
+    protected $fillable = [/* mass assignable fields */];
+    
+    // Activity logging configuration
+    protected static $logName = 'Model Name';
+    protected static $logOnlyDirty = true;
+    protected static $logAttributes = [/* logged fields */];
 }
 ```
 
-**See:** [Controller Scaffolding - Authentication](controller-scaffolding.md)
+## 🏢 Core Infrastructure Models
 
----
+### SiteModel
 
-### Contact Model
+Represents physical locations (malls, properties) where metering equipment is deployed.
 
-**Path:** `app/Models/Contact.php`  
-**Table:** `contacts`  
-**Extends:** `Lbhurtado\Contact\Models\Contact`
+**File:** `app/Models/SiteModel.php`  
+**Table:** `meter_site`  
+**Primary Key:** `site_id`
 
+**Fillable Attributes:**
+- `division_idx` - Foreign key to division
+- `company_idx` - Foreign key to company
+- `building_idx` - Foreign key to building (nullable)
+- `site_code` - Building code/identifier
+- `created_by_user_idx` - Creator user ID
+- `modified_by_user_idx` - Last modifier user ID
+
+**Activity Log Name:** "Site Details"
+
+**Relationships:**
 ```php
-namespace App\Models;
+// Suggested relationships (not explicitly defined in code)
+// belongsTo(CompanyModel::class, 'company_idx', 'company_id')
+// belongsTo(DivisionModel::class, 'division_idx', 'division_id')
+// hasMany(GatewayModel::class, 'site_idx', 'site_id')
+// hasMany(MeterModel::class, 'site_idx', 'site_id')
+// hasMany(BuildingModel::class, 'site_idx', 'site_id')
+```
 
-use Lbhurtado\Contact\Models\Contact as BaseContact;
+### GatewayModel
 
-class Contact extends BaseContact
+Represents Remote Terminal Units (RTUs) that collect meter data.
+
+**File:** `app/Models/GatewayModel.php`  
+**Table:** `meter_rtu`  
+**Primary Key:** `rtu_id`
+
+**Fillable Attributes:**
+- `gateway_sn` - Gateway serial number
+- `gateway_mac` - MAC address (used in device API)
+- `gateway_ip` - IP address
+- `rtu_physical_location` - Physical location description
+- `update_rtu` - CSV update flag (0/1)
+- `update_rtu_location` - Site code update flag (0/1)
+- `update_rtu_ssh` - SSH enabled flag (0/1)
+- `update_rtu_force_lp` - Force load profile flag (0/1)
+- `idf_number` - IDF identifier
+- `switch_name` - Network switch name
+- `idf_port` - Switch port number
+- `last_log_update` - Last communication timestamp
+- `soft_rev` - Software/firmware revision
+- `created_by_user_idx` - Creator user ID
+- `modified_by_user_idx` - Last modifier user ID
+
+**Activity Log Name:** "Gateway Details"
+
+**Key Flags:**
+- `update_rtu` = 1: Gateway will download CSV configuration
+- `update_rtu_location` = 1: Gateway will download site code
+- `update_rtu_ssh` = 1: SSH access enabled
+- `update_rtu_force_lp` = 1: Force load profile collection
+
+**Relationships:**
+```php
+// belongsTo(SiteModel::class, 'site_idx', 'site_id')
+// belongsTo(MeterLocationModel::class, 'location_idx', 'location_id')
+// hasMany(MeterModel::class, 'rtu_idx', 'rtu_id')
+```
+
+### MeterModel
+
+Represents electricity meters connected to gateways.
+
+**File:** `app/Models/MeterModel.php`  
+**Table:** `meter_details`  
+**Primary Key:** `meter_id`
+
+**Fillable Attributes:**
+- `site_idx` - Foreign key to site
+- `rtu_idx` - Foreign key to gateway
+- `location_idx` - Foreign key to meter location
+- `config_idx` - Foreign key to configuration file
+- `site_code` - Site code
+- `meter_name` - Meter identifier/name
+- `meter_name_addressable` - Is addressable (1/0)
+- `meter_default_name` - Default meter name
+- `meter_type` - Meter type
+- `meter_brand` - Manufacturer
+- `meter_role` - Role (e.g., "Client Meter")
+- `meter_remarks` - Additional notes
+- `customer_name` - Customer/tenant name
+- `meter_multiplier` - Reading multiplier (default: 1)
+- `meter_status` - Current status
+- `created_by_user_idx` - Creator user ID
+- `modified_by_user_idx` - Last modifier user ID
+
+**Activity Log Name:** "Meter Details"
+
+**Relationships:**
+```php
+// belongsTo(SiteModel::class, 'site_idx', 'site_id')
+// belongsTo(GatewayModel::class, 'rtu_idx', 'rtu_id')
+// belongsTo(BuildingModel::class, 'building_idx', 'building_id')
+// belongsTo(MeterLocationModel::class, 'location_idx', 'location_id')
+// belongsTo(ConfigurationFileModel::class, 'config_idx', 'config_id')
+```
+
+### BuildingModel
+
+Represents buildings within sites.
+
+**File:** `app/Models/BuildingModel.php`  
+**Table:** `meter_building_table`  
+**Primary Key:** `building_id`
+
+**Fillable Attributes:**
+- `site_idx` - Foreign key to site
+- `building_code` - Building code
+- `building_description` - Building name/description
+- `cut_off` - Billing cut-off day
+- `device_ip_range` - IP address range
+- `ip_network` - Network address
+- `ip_netmask` - Network mask
+- `ip_gateway` - Gateway IP
+- `created_by_user_idx` - Creator user ID
+- `modified_by_user_idx` - Last modifier user ID
+
+**Activity Log Name:** "Building Details"
+
+**Relationships:**
+```php
+// belongsTo(SiteModel::class, 'site_idx', 'site_id')
+// hasMany(MeterLocationModel::class, 'building_id', 'building_id')
+// hasMany(MeterModel::class, 'building_idx', 'building_id')
+```
+
+### MeterLocationModel
+
+Represents meter locations (EE rooms) within buildings.
+
+**File:** `app/Models/MeterLocationModel.php`  
+**Table:** `meter_location_table`  
+**Primary Key:** `location_id`
+
+**Fillable Attributes:**
+- `site_idx` - Foreign key to site
+- `building_id` - Foreign key to building
+- `location_code` - Location code (e.g., "EER-01")
+- `location_description` - Location description
+- `created_by_user_idx` - Creator user ID
+- `modified_by_user_idx` - Last modifier user ID
+
+**Activity Log Name:** "Location Details"
+
+**Relationships:**
+```php
+// belongsTo(SiteModel::class, 'site_idx', 'site_id')
+// belongsTo(BuildingModel::class, 'building_id', 'building_id')
+// hasMany(GatewayModel::class, 'location_idx', 'location_id')
+// hasMany(MeterModel::class, 'location_idx', 'location_id')
+```
+
+## 🏛️ Organization Models
+
+### CompanyModel
+
+Represents companies/organizations.
+
+**File:** `app/Models/CompanyModel.php`  
+**Table:** `meter_company_table`  
+**Primary Key:** `company_id`
+
+**Fillable Attributes:**
+- `company_code` - Company code
+- `company_name` - Company name
+- `created_by_user_idx` - Creator user ID
+- `modified_by_user_idx` - Last modifier user ID
+
+**Activity Log Name:** "Company Details"
+
+**Relationships:**
+```php
+// hasMany(SiteModel::class, 'company_idx', 'company_id')
+```
+
+### DivisionModel
+
+Represents divisions within companies.
+
+**File:** `app/Models/DivisionModel.php`  
+**Table:** `meter_division_table`  
+**Primary Key:** `division_id`
+
+**Fillable Attributes:**
+- `division_code` - Division code
+- `division_name` - Division name
+- `created_by_user_idx` - Creator user ID
+- `modified_by_user_idx` - Last modifier user ID
+
+**Activity Log Name:** "Division Details"
+
+**Relationships:**
+```php
+// hasMany(SiteModel::class, 'division_idx', 'division_id')
+```
+
+## 👤 User Models
+
+### User
+
+Authentication model extending Laravel's `Authenticatable`.
+
+**File:** `app/Models/User.php`  
+**Table:** `user_tb`  
+**Primary Key:** `user_id` (auto-increment)
+
+**Fillable Attributes:**
+- `user_real_name` - Full name
+- `user_name` - Username (login)
+- `user_password` - Hashed password
+
+**Hidden Attributes:**
+- `user_password` - Never exposed in JSON
+- `remember_token` - Session token
+
+**Key Features:**
+- Extends Laravel's `Authenticatable` for auth integration
+- Uses `Notifiable` trait for notifications
+- Password automatically hashed using bcrypt
+
+**Additional Fields (not in fillable):**
+- `user_type` - User type ("Admin", "User")
+- `user_access` - Access level ("All", "Selected")
+- `user_email_address` - Email for password reset
+- `user_site_list_ids` - Comma-separated site IDs (if "Selected")
+- `user_expiration` - Account expiration date
+
+### UserAccountModel
+
+**File:** `app/Models/UserAccountModel.php`  
+**Table:** `user_tb`  
+**Purpose:** Additional user operations (separate from auth)
+
+### UserSiteAccessModel
+
+**File:** `app/Models/UserSiteAccessModel.php`  
+**Table:** `user_access_group`  
+**Purpose:** User-site access mapping (many-to-many)
+
+## ⚙️ Configuration Models
+
+### ConfigurationFileModel
+
+Meter configuration files for different meter models.
+
+**File:** `app/Models/ConfigurationFileModel.php`  
+**Table:** `meter_configuration_file`  
+**Primary Key:** `config_id`
+
+**Purpose:** Stores meter model configurations used by gateways
+
+### WebPageSettingsModel
+
+Web interface customization settings.
+
+**File:** `app/Models/WebPageSettingsModel.php`  
+**Table:** `web_page_settings`  
+**Primary Key:** `setting_id`
+
+**Purpose:** Logo, header title, navigation customization
+
+## 📊 Data Models
+
+### MeterDataModel
+
+Time-series meter reading data.
+
+**File:** `app/Models/MeterDataModel.php`  
+**Table:** `meter_data`  
+**Primary Key:** `id` (BIGINT)
+
+**Purpose:** Stores electrical measurements (voltage, current, power, energy)
+
+**Note:** This table grows continuously. Consider archival strategy.
+
+## 🔗 Relationships Summary
+
+### Hierarchy
+```
+Company (1) → (N) Site
+Division (1) → (N) Site
+Site (1) → (N) Building
+Site (1) → (N) MeterLocation
+Site (1) → (N) Gateway
+Site (1) → (N) Meter
+Building (1) → (N) MeterLocation
+Gateway (1) → (N) Meter
+MeterLocation (1) → (N) Gateway
+MeterLocation (1) → (N) Meter
+ConfigurationFile (1) → (N) Meter
+```
+
+### Defining Relationships in Models
+
+While relationships are not explicitly defined in the current models, they can be added:
+
+```php path=null start=null
+// Example: In SiteModel.php
+public function company()
 {
-    protected $fillable = [
-        'name',
-        'mobile',
-        'email',
-        'extra',
-    ];
+    return $this->belongsTo(CompanyModel::class, 'company_idx', 'company_id');
+}
 
-    protected $casts = [
-        'extra' => 'array',
-    ];
+public function division()
+{
+    return $this->belongsTo(DivisionModel::class, 'division_idx', 'division_id');
+}
 
-    // Relationships
-    public function groups()
-    {
-        return $this->belongsToMany(Group::class)
-            ->withTimestamps();
-    }
+public function gateways()
+{
+    return $this->hasMany(GatewayModel::class, 'site_idx', 'site_id');
+}
 
-    // Scopes
-    public function scopeSearch($query, $search)
-    {
-        return $query->where('name', 'like', "%{$search}%")
-            ->orWhere('mobile', 'like', "%{$search}%");
-    }
+public function meters()
+{
+    return $this->hasMany(MeterModel::class, 'site_idx', 'site_id');
 }
 ```
 
-**Features:**
-- Phone normalization (inherited from package)
-- Group relationships
-- Search scope
-- JSON extra field for additional data
+## 📋 Activity Logging
 
-**See:** [Contact Package](contact-package.md)
+All models use **Spatie Laravel ActivityLog** for audit trails.
 
----
+### Configuration
 
-### Group Model
+```php path=null start=null
+protected static $logName = 'Model Name';  // Log category
+protected static $logOnlyDirty = true;     // Log only changed attributes
+protected static $logAttributes = [...];    // Which fields to log
+```
 
-**Path:** `app/Models/Group.php`  
-**Table:** `groups`
+### Custom Causer
 
-```php
-namespace App\Models;
+All models override `tapActivity()` to set the user from session:
 
-use Illuminate\Database\Eloquent\Model;
-
-class Group extends Model
+```php path=null start=null
+public function tapActivity(Activity $activity, string $eventName)
 {
-    protected $fillable = [
-        'name',
-        'description',
-        'user_id',
-    ];
-
-    // Relationships
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function contacts()
-    {
-        return $this->belongsToMany(Contact::class)
-            ->withTimestamps();
-    }
-
-    // Accessors
-    public function getContactCountAttribute()
-    {
-        return $this->contacts()->count();
-    }
+    $activity->causer_id = Session::get('loginID');
 }
 ```
 
-**See:** [Backend Services - Group Management](backend-services.md)
+### Viewing Activity Logs
 
----
+Activity logs are stored in the `activity_log` table:
 
-### ScheduledMessage Model
-
-**Path:** `app/Models/ScheduledMessage.php`  
-**Table:** `scheduled_messages`
-
-```php
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
-
-class ScheduledMessage extends Model
-{
-    protected $fillable = [
-        'message',
-        'recipients',
-        'group_ids',
-        'sender_id',
-        'scheduled_at',
-        'status',
-    ];
-
-    protected $casts = [
-        'recipients' => 'array',
-        'group_ids' => 'array',
-        'scheduled_at' => 'datetime',
-    ];
-
-    // Scopes
-    public function scopePending($query)
-    {
-        return $query->where('status', 'pending');
-    }
-
-    public function scopeDue($query)
-    {
-        return $query->where('scheduled_at', '<=', now())
-            ->where('status', 'pending');
-    }
-
-    // Status helpers
-    public function markAsProcessing()
-    {
-        $this->update(['status' => 'processing']);
-    }
-
-    public function markAsSent()
-    {
-        $this->update(['status' => 'sent']);
-    }
-
-    public function markAsFailed()
-    {
-        $this->update(['status' => 'failed']);
-    }
-}
+```sql
+SELECT * FROM activity_log 
+WHERE subject_type = 'App\\Models\\SiteModel' 
+  AND subject_id = 1 
+ORDER BY created_at DESC;
 ```
 
-**Features:**
-- JSON recipients and group_ids
-- Status management methods
-- Query scopes for job processing
+## 🛠️ Usage Examples
 
-**See:** [Scheduled Messaging](scheduled-messaging.md)
+### Creating a Site
 
----
-
-### BlacklistedNumber Model
-
-**Path:** `app/Models/BlacklistedNumber.php`  
-**Table:** `blacklisted_numbers`
-
-```php
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class BlacklistedNumber extends Model
-{
-    protected $fillable = [
-        'mobile',
-        'reason',
-        'notes',
-        'added_by',
-    ];
-
-    // Static helpers
-    public static function isBlacklisted(string $mobile): bool
-    {
-        return static::where('mobile', $mobile)->exists();
-    }
-
-    public static function add(string $mobile, string $reason, ?string $notes = null, string $addedBy = 'system'): self
-    {
-        return static::updateOrCreate(
-            ['mobile' => $mobile],
-            [
-                'reason' => $reason,
-                'notes' => $notes,
-                'added_by' => $addedBy,
-            ]
-        );
-    }
-
-    public static function remove(string $mobile): bool
-    {
-        return static::where('mobile', $mobile)->delete() > 0;
-    }
-
-    // Scopes
-    public function scopeByReason($query, string $reason)
-    {
-        return $query->where('reason', $reason);
-    }
-
-    public function scopeOptOuts($query)
-    {
-        return $query->where('reason', 'opt-out');
-    }
-}
+```php path=null start=null
+$site = SiteModel::create([
+    'division_idx' => 1,
+    'company_idx' => 1,
+    'site_code' => 'MALL-01',
+    'created_by_user_idx' => Session::get('loginID')
+]);
+// Automatically logged to activity_log
 ```
 
-**Features:**
-- Static helper methods for blacklist operations
-- Reason-based scopes
-- Used by CheckBlacklist middleware
+### Updating a Gateway
 
-**See:** [Blacklist Feature](blacklist-feature.md)
-
----
-
-### SenderID Model
-
-**Path:** `app/Models/SenderID.php`  
-**Table:** `sender_ids`
-
-```php
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class SenderID extends Model
-{
-    protected $table = 'sender_ids';
-
-    protected $fillable = [
-        'sender_id',
-        'name',
-        'is_active',
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
-    // Scopes
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-
-    // Static helpers
-    public static function getActive()
-    {
-        return static::active()->pluck('name', 'sender_id');
-    }
-}
+```php path=null start=null
+$gateway = GatewayModel::find($id);
+$gateway->update_rtu = 1;  // Enable CSV update
+$gateway->save();
+// Only 'update_rtu' change is logged (logOnlyDirty = true)
 ```
 
-**Features:**
-- Active/inactive status
-- Pre-approved branded sender IDs
+### Querying Meters
 
-**See:** [Backend Services](backend-services.md)
+```php path=null start=null
+// Get all meters for a site
+$meters = MeterModel::where('site_idx', $siteId)->get();
+
+// Get meters for a specific gateway
+$meters = MeterModel::where('rtu_idx', $gatewayId)->get();
+
+// With eager loading (if relationships defined)
+$site = SiteModel::with(['meters', 'gateways'])->find($id);
+```
+
+## 🐛 Common Patterns
+
+### Soft Deletes
+
+Models do **not** use soft deletes. The `meter_site` table has a `deleted_at` column but it's a VARCHAR, not a proper soft delete implementation.
+
+### Timestamps
+
+Models use Laravel's automatic timestamps (`created_at`, `updated_at`), but also track:
+- `created_by_user_idx` - User who created
+- `modified_by_user_idx` - User who last modified
+
+### Foreign Key Naming
+
+Foreign keys use `_idx` suffix:
+- `site_idx` → references `site_id`
+- `rtu_idx` → references `rtu_id`
+- `company_idx` → references `company_id`
+
+## ⚠️ Important Notes
+
+1. **No Explicit Relationships:** Models don't define Eloquent relationships. Joins are done manually in controllers.
+2. **Session-Based User Tracking:** Uses `Session::get('loginID')` instead of `Auth::id()`
+3. **Activity Logging:** All CRUD operations are automatically logged for audit purposes
+4. **Mass Assignment Protection:** Only fields in `$fillable` can be mass-assigned
+5. **Primary Keys:** All use auto-incrementing integer IDs with `_id` suffix
+
+## 📚 Related Documentation
+
+- [Database Schema](database-schema.md) - Complete table structures
+- [Site Management](modules/site-management.md) - Using SiteModel
+- [Gateway Management](modules/gateway-management.md) - Using GatewayModel
+- [Meter Management](modules/meter-management.md) - Using MeterModel
 
 ---
 
-## Model Conventions
-
-### Naming
-- Singular PascalCase (e.g., `Contact`, `Group`)
-- Table names are plural snake_case (auto-inferred)
-
-### Fillable vs Guarded
-- Use `$fillable` for explicit mass assignment
-- Avoid `$guarded` unless protecting specific fields
-
-### Casts
-- Use `$casts` for type conversion (datetime, array, boolean)
-- JSON columns should be cast to `array`
-
-### Relationships
-- Define inverse relationships for Eloquent magic
-- Use `withTimestamps()` on pivot tables
-- Use `constrained()` and `onDelete('cascade')` in migrations
-
-### Scopes
-- Global scopes for model-wide filters
-- Local scopes for reusable query constraints
-- Prefix with `scope` (e.g., `scopeActive`)
-
-### Static Helpers
-- Use for common operations (e.g., `BlacklistedNumber::isBlacklisted()`)
-- Keep business logic in Actions, not models
-
-## Related Documentation
-
-- [Database Schema](database-schema.md)
-- [Backend Services](backend-services.md)
-- [Test Scaffolding - Factories](test-scaffolding.md)
+**Model Count:** 13 models  
+**Activity Logging:** Enabled on all except User  
+**Eloquent Relationships:** Not explicitly defined (manual joins used)

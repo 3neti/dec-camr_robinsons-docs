@@ -1,121 +1,114 @@
-# Text Commander (txtcmdr)
+# CAMR Robinsons - Centralized Automated Meter Reading System
 
-A fast-deployable SMS broadcasting system with a branded sender ID. Built with Laravel 12, Inertia.js, Vue 3, and PostgreSQL.
+## 📊 Overview
 
-## 🚀 Quick Links
-- [Quick Start](quick-start.md)
-- [Development Plan](development-plan.md)
-- [API Documentation](api-documentation.md)
+The **Centralized Automated Meter Reading (CAMR)** system for Robinsons is a Laravel 8-based web application designed to monitor, manage, and report on electricity consumption across multiple sites. The system collects data from remote gateways and meters, providing comprehensive reporting and analysis capabilities.
 
-## 📚 Documentation Map
+## ✨ Key Features
 
-```mermaid
-flowchart TB
-    Start(["🏠 Text Commander Docs"])
-    
-    Start --> GettingStarted["📖 Getting Started"]
-    Start --> DevPlan["📋 Development Plan"]
-    Start --> CoreFeatures["⚡ Core Features"]
-    Start --> API["🔌 API Reference"]
-    Start --> Backend["🔧 Backend"]
-    Start --> Frontend["🎨 Frontend"]
-    Start --> Testing["🧪 Testing"]
-    Start --> Operations["⚙️ Operations"]
-    
-    GettingStarted --> QS["Quick Start"]
-    GettingStarted --> PA["Package Architecture"]
-    
-    CoreFeatures --> SMS["SMS Broadcasting"]
-    CoreFeatures --> Schedule["Scheduled Messaging"]
-    CoreFeatures --> Blacklist["Blacklist/No-Send"]
-    CoreFeatures --> Groups["Group Management"]
-    CoreFeatures --> Contacts["Contact Management"]
-    
-    SMS --> PhoneNorm["Phone Normalization"]
-    SMS --> Integration["EngageSpark Integration"]
-    
-    API --> APIDoc["API Documentation"]
-    API --> DTOs["Interfaces & DTOs"]
-    
-    Backend --> DB["📊 Database Schema"]
-    Backend --> Services["Backend Services"]
-    Backend --> Models["Models"]
-    Backend --> Jobs["Jobs & Commands"]
-    Backend --> Middleware["Middleware"]
-    Backend --> Controllers["Controllers"]
-    Backend --> Packages["📦 Third-Party Packages"]
-    
-    Frontend --> FrontendScaf["Vue/Inertia Scaffolding"]
-    Frontend --> UIUX["UI/UX Design"]
-    Frontend --> Wireframes["Wireframes"]
-    
-    Testing --> TestScaf["Test Scaffolding (Pest)"]
-    
-    Operations --> Security["🔐 Security & Compliance"]
-    Operations --> Events["Events & Listeners"]
-    Operations --> Notifications["Notifications"]
-    Operations --> Logging["Logging & Monitoring"]
-    Operations --> Deployment["DevOps & Deployment"]
-    
-    Start --> Appendices["📚 Appendices"]
-    Appendices --> Reference["Reference Guide"]
-    Appendices --> TODO["Documentation TODO"]
-    
-    style Start fill:#4f46e5,stroke:#312e81,stroke-width:3px,color:#fff
-    style CoreFeatures fill:#10b981,stroke:#047857,color:#fff
-    style Backend fill:#f59e0b,stroke:#d97706,color:#fff
-    style Frontend fill:#ec4899,stroke:#be185d,color:#fff
-    style Operations fill:#8b5cf6,stroke:#6d28d9,color:#fff
-```
+### 🏢 Site & Building Management
+- Multi-site support with hierarchical organization
+- Building and meter location tracking
+- Company and division management
+- Customizable site access controls
 
-### 1) Getting Started
-- [Quick Start](quick-start.md)
-- [Package Architecture](package-architecture.md)
+### 📡 Gateway & Meter Operations
+- Real-time gateway monitoring and configuration
+- Remote gateway management (SSH, CSV updates, site code updates)
+- Meter data collection and storage
+- Load profile receiving and processing
+- Offline detection and alerting
 
-### 2) Core Features
-- [SMS Integration](sms-integration.md)
-- [Phone Normalization](phone-normalization.md)
-- [Scheduled Messaging](scheduled-messaging.md)
-- [Blacklist (No-Send List)](blacklist-feature.md)
-- [Group Management](group-management.md)
-- [Contact Management](contact-package.md)
+### 📈 Comprehensive Reporting
+- **SAP Report** - Integration with SAP systems
+- **RAW Report** - Raw meter data exports
+- **Site Report** - Site-level consumption summaries
+- **Consumption Report** - Hourly and daily consumption analysis
+- **Demand Report** - Peak demand tracking (15-min and hourly intervals)
+- **Offline Report** - Gateway and meter availability reports
+- **Site As-Built** - Infrastructure documentation exports
 
-### 3) API Reference
-- [API Documentation](api-documentation.md)
-- [Interfaces & DTOs](interfaces-and-dtos.md)
+### 👥 User Management
+- Role-based access control
+- Site-specific access permissions
+- User account management
+- Password reset functionality via email
 
-### 4) Database
-- [Database Schema](database-schema.md)
+### ⚙️ Configuration & Customization
+- Web page branding (logo, navigation, header customization)
+- Configuration file management
+- Email notifications
+- Company and division hierarchies
 
-### 5) Backend Architecture
-- [Backend Services](backend-services.md)
-- [Models](models.md)
-- [Jobs & Commands](jobs-commands.md)
-- [Middleware](middleware.md)
+## 🛠️ Technology Stack
 
-### 6) Controllers
-- [Controller Scaffolding](controller-scaffolding.md)
+- **Framework:** Laravel 8.x
+- **PHP Version:** 7.3+ / 8.0+
+- **Database:** MySQL
+- **Frontend:** Blade templates with Bootstrap
+- **Build Tools:** Laravel Mix, Webpack
+- **Key Packages:**
+  - `maatwebsite/excel` - Excel import/export
+  - `yajra/laravel-datatables-oracle` - DataTables server-side processing
+  - `spatie/laravel-activitylog` - Activity logging
+  - `phpoffice/phpspreadsheet` - Advanced spreadsheet operations
 
-### 7) Frontend
-- [Frontend Scaffolding](frontend-scaffolding.md)
-- [UI/UX Design](ui-ux-design.md)
-- [Wireframes](wireframes.md)
+## 📋 System Components
 
-### 8) Testing
-- [Test Scaffolding](test-scaffolding.md)
+### Core Modules
+1. **Site Management** - Site creation, configuration, and dashboard
+2. **Gateway Management** - Gateway registration, monitoring, and remote control
+3. **Meter Management** - Meter registration, data collection, and CSV import
+4. **Building Management** - Building structure and organization
+5. **Meter Location** - EE room and meter placement tracking
 
-### 9) Third-Party Packages
-- [Package Overview](packages.md)
+### Reporting Engine
+- Web-based report generation with preview
+- Direct Excel export functionality
+- Customizable date ranges and filters
+- Building and meter-level granularity
 
-### 10) Security & Compliance
-- [Security Guide](security.md)
+### Device Communication
+- Gateway polling endpoints (`/rtu/index.php/rtu/...`)
+- CSV configuration updates
+- Load profile data reception
+- Remote SSH access control
 
-### 11) Operations
-- [Jobs, Events & Listeners](events-listeners.md)
-- [Notifications](notifications.md)
-- [Logging & Monitoring](logging-monitoring.md)
-- [DevOps & Deployment](deployment.md)
+## 🚀 Quick Start
 
-### 12) Appendices
-- [Reference Guide](appendices.md)
-- [Documentation TODO](TODO-SECTIONS.md)
+1. **System Requirements** - PHP 7.3+, MySQL, Composer, Node.js
+2. **Installation** - Clone repository, install dependencies, configure `.env`
+3. **Database Setup** - Run migrations to create database schema
+4. **Web Server** - Configure Apache/Nginx to serve the application
+5. **Gateway Configuration** - Register gateways and configure meter endpoints
+
+## 📚 Documentation Structure
+
+This documentation is organized into the following sections:
+
+- **Getting Started** - Installation and initial setup
+- **System Architecture** - Technical design and data flow
+- **Core Modules** - Detailed feature documentation
+- **Reporting** - Report types and usage
+- **User Management** - Access control and authentication
+- **Database** - Schema and models
+- **API Reference** - Gateway and load profile APIs
+- **Configuration** - Environment and customization
+- **Maintenance** - Troubleshooting and known issues
+
+## 🎯 Project Context
+
+This documentation was created as part of a **turnover process** to enable new development teams to understand, maintain, and enhance the CAMR Robinsons system. The system is currently in production use for monitoring electricity consumption across Robinsons properties.
+
+## 📞 Support
+
+For technical questions or issues:
+- Review the **Troubleshooting** section
+- Check **Known Issues** in the Maintenance section
+- Consult **Developer Notes** in the Appendices
+
+---
+
+**Last Updated:** November 2024  
+**Laravel Version:** 8.x  
+**Database:** meter_reading_robinsons

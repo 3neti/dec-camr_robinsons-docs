@@ -1,3 +1,128 @@
+# CAMR Robinsons Documentation
+
+MkDocs-based documentation for the Centralized Automated Meter Reading (CAMR) system used by Robinsons properties.
+
+## Purpose
+
+This documentation was created as part of a **turnover process** to help new development teams understand, maintain, and enhance the Laravel 8-based CAMR application located at:
+
+```
+~/Documents/DEC/camr_robinsons-main/camr_robinsons-main/
+```
+
+## Quick Start
+
+1. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Run development server:**
+   ```bash
+   mkdocs serve
+   ```
+
+3. **View documentation:**
+   Open http://localhost:8000 in your browser
+
+## What's Included
+
+### Completed Documentation
+- ✅ **index.md** - Landing page with system overview
+- ✅ **overview.md** - Detailed architecture and business objectives
+- ✅ **WARP.md** - Guidance for AI-assisted documentation development
+
+### Documentation Structure
+The documentation is organized into the following sections:
+
+1. **Getting Started** - Installation, requirements, and setup
+2. **System Architecture** - Technical design and data flow
+3. **Core Modules** - Site, Gateway, Meter, Building, Location management
+4. **Reporting** - SAP, RAW, Site, Consumption, Demand, and Offline reports
+5. **User Management** - Authentication and access control
+6. **Database** - Schema and models
+7. **API Reference** - Gateway device and load profile APIs
+8. **Configuration** - Environment setup and customization
+9. **Maintenance** - Troubleshooting and known issues
+10. **Appendices** - Glossary and developer notes
+
+### Template Files
+Most documentation files are still placeholder stubs from the template and need to be populated with CAMR-specific content by analyzing the Laravel codebase.
+
+## Technology Stack
+
+- **MkDocs** with Material theme
+- **Mermaid** for diagrams
+- **Python 3.11+**
+
+## Building the Docs
+
+```bash
+# Build static site
+mkdocs build
+
+# Build with strict link checking
+mkdocs build --strict
+```
+
+Output will be in the `site/` directory.
+
+## Next Steps for Documentation
+
+Priority areas to complete:
+
+1. **Installation Guide** - Document setup process for new developers
+2. **Database Schema** - Document all tables and relationships from migrations
+3. **Core Modules** - Document each major feature (Site, Gateway, Meter management)
+4. **Report Workflows** - Explain how each report type works
+5. **API Endpoints** - Document gateway device communication
+6. **Troubleshooting** - Common issues and solutions
+7. **Developer Notes** - Code insights and architectural decisions
+
+## Source Code Analysis
+
+The CAMR Laravel application has the following structure:
+
+### Key Controllers
+- `CAMRSiteController` - Site management
+- `CAMRGatewayController` - Gateway operations
+- `CAMRMeterController` - Meter management
+- `CAMRBuildingController` - Building management
+- `CAMRMeterLocationController` - Location management
+- `CAMRGatewayDeviceController` - Device API endpoints
+- Various report controllers (SAP, RAW, Site, Consumption, Demand, Offline)
+
+### Key Models
+- `SiteModel` - Sites
+- `GatewayModel` - Gateways/RTUs
+- `MeterModel` - Meters
+- `BuildingModel` - Buildings
+- `MeterLocationModel` - Meter locations
+- `MeterDataModel` - Time-series data
+- `CompanyModel` / `DivisionModel` - Organizational hierarchy
+- `User` / `UserAccountModel` - User management
+
+### Database
+- Database name: `meter_reading_robinsons`
+- 14 migration files defining schema
+- Relationships: Sites → Gateways → Meters, with Building and Location hierarchies
+
+## Contributing
+
+When adding documentation:
+
+1. Create markdown files in appropriate `docs/` subdirectories
+2. Update `mkdocs.yml` navigation
+3. Test locally with `mkdocs serve`
+4. Follow the conventions in `WARP.md`
+
+## Support
+
+For questions about the CAMR system or this documentation, refer to:
+- The documentation itself (once complete)
+- Laravel codebase at `~/Documents/DEC/camr_robinsons-main/camr_robinsons-main/`
+- `WARP.md` for AI-assisted documentation guidance
+
 # ENF Platform Documentation
 
 Comprehensive documentation library for the **Electronic Notarization Facility (ENF)** platform - a two-sided marketplace for electronic notarization services in the Philippines.

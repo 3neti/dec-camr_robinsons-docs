@@ -48,6 +48,7 @@ nav:
     - Package Architecture: package-architecture.md
     - Backend Services: backend-services.md
     - SMS Integration: sms-integration.md
+    - Scheduled Messaging: scheduled-messaging.md
     - Phone Normalization: phone-normalization.md
     - Contact Package: contact-package.md
     - Interfaces & DTOs: interfaces-and-dtos.md

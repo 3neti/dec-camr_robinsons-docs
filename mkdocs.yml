@@ -38,12 +38,14 @@ theme:
 
 nav:
   - Home: index.md
+  - Quick Start: quick-start.md
   - Plans:
     - Business Plan: business-plan.md
     - Development Plan: development-plan.md
     - Marketing Plan: marketing-plan.md
     - Fundraising Plan: fundraising-plan.md
   - Technical Reference:
+    - Package Architecture: package-architecture.md
     - Backend Services: backend-services.md
     - Interfaces & DTOs: interfaces-and-dtos.md
     - API Documentation: api-documentation.md

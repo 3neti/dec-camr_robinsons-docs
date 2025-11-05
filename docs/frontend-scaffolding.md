@@ -1,0 +1,1549 @@
+# Frontend Scaffolding
+
+This document provides complete scaffolding for all Vue 3 + Inertia.js pages, components, TypeScript types, and composables for Text Commander.
+
+---
+
+## Table of Contents
+
+- [Directory Structure](#directory-structure)
+- [TypeScript Types](#typescript-types)
+- [Layouts](#layouts)
+- [Pages](#pages)
+- [Components](#components)
+- [Composables](#composables)
+- [API Client](#api-client)
+- [Configuration](#configuration)
+
+---
+
+## Directory Structure
+
+```
+resources/
+├── js/
+│   ├── Pages/
+│   │   ├── Auth/
+│   │   │   └── Login.vue
+│   │   ├── Dashboard.vue
+│   │   ├── Contacts/
+│   │   │   ├── Index.vue
+│   │   │   └── Edit.vue
+│   │   ├── Logs/
+│   │   │   └── Index.vue
+│   │   └── Settings/
+│   │       └── Index.vue
+│   ├── Components/
+│   │   ├── Layout/
+│   │   │   ├── AppLayout.vue
+│   │   │   └── TopNav.vue
+│   │   ├── SMSComposer/
+│   │   │   ├── RecipientInput.vue
+│   │   │   ├── MessageTextarea.vue
+│   │   │   └── SenderSelect.vue
+│   │   ├── Shared/
+│   │   │   ├── Button.vue
+│   │   │   ├── Input.vue
+│   │   │   ├── Card.vue
+│   │   │   └── ScheduleModal.vue
+│   │   └── Contacts/
+│   │       ├── ContactCard.vue
+│   │       └── GroupCard.vue
+│   ├── Composables/
+│   │   ├── useContacts.ts
+│   │   ├── useSMS.ts
+│   │   ├── useAutocomplete.ts
+│   │   └── useToast.ts
+│   ├── Types/
+│   │   ├── models.ts
+│   │   ├── api.ts
+│   │   └── forms.ts
+│   ├── Utils/
+│   │   ├── api.ts
+│   │   ├── formatters.ts
+│   │   └── validators.ts
+│   └── app.ts
+└── css/
+    └── app.css
+```
+
+---
+
+## TypeScript Types
+
+### `resources/js/Types/models.ts`
+
+```typescript
+export interface Contact {
+  id: number
+  mobile: string
+  mobile_e164: string
+  country: string
+  name?: string
+  bank_account?: string
+  bank_code?: string
+  account_number?: string
+  tags: string[]
+  extra_attributes: Record<string, any>
+  created_at: string
+  updated_at: string
+}
+
+export interface Group {
+  id: number
+  name: string
+  description?: string
+  contacts_count: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ScheduledMessage {
+  id: number
+  message: string
+  sender_id: string
+  recipient_type: 'numbers' | 'group' | 'mixed'
+  recipient_data: {
+    numbers: string[]
+    groups: Array<{
+      id: number
+      name: string
+      count: number
+    }>
+  }
+  scheduled_at: string
+  sent_at?: string
+  status: 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled'
+  total_recipients: number
+  sent_count: number
+  failed_count: number
+  errors?: Array<{
+    number: string
+    error: string
+  }>
+  created_at: string
+  updated_at: string
+}
+
+export interface User {
+  id: number
+  name: string
+  email: string
+  role: string
+  created_at: string
+  updated_at: string
+}
+
+export interface SenderID {
+  id: number
+  name: string
+  is_default: boolean
+}
+
+export interface SMSLog {
+  id: number
+  mobile: string
+  message: string
+  sender_id: string
+  status: 'sent' | 'failed' | 'pending'
+  sent_at?: string
+  error?: string
+  created_at: string
+}
+```
+
+### `resources/js/Types/api.ts`
+
+```typescript
+import { Contact, Group, ScheduledMessage, SMSLog } from './models'
+
+export interface SendSMSRequest {
+  recipients: string | string[]
+  message: string
+  sender_id?: string
+}
+
+export interface SendSMSResponse {
+  status: 'queued'
+  count: number
+  recipients: string[]
+  invalid_count: number
+}
+
+export interface ScheduleSMSRequest {
+  recipients: string | string[]
+  message: string
+  scheduled_at: string
+  sender_id?: string
+}
+
+export interface ScheduleSMSResponse {
+  id: number
+  status: 'scheduled'
+  scheduled_at: string
+  recipient_count: number
+  message: string
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  links: {
+    first: string
+    last: string
+    prev: string | null
+    next: string | null
+  }
+  meta: {
+    current_page: number
+    from: number
+    last_page: number
+    path: string
+    per_page: number
+    to: number
+    total: number
+  }
+}
+
+export interface ApiError {
+  message: string
+  errors?: Record<string, string[]>
+}
+```
+
+### `resources/js/Types/forms.ts`
+
+```typescript
+export interface SMSComposerForm {
+  recipients: string[]
+  message: string
+  senderId: string
+}
+
+export interface ContactForm {
+  mobile: string
+  name?: string
+  tags: string[]
+}
+
+export interface GroupForm {
+  name: string
+  description?: string
+}
+
+export interface LoginForm {
+  email: string
+  password: string
+  remember: boolean
+}
+
+export interface ScheduleForm {
+  date: string
+  time: string
+}
+```
+
+---
+
+## Layouts
+
+### `resources/js/Components/Layout/AppLayout.vue`
+
+```vue
+<template>
+  <div class="min-h-screen bg-gray-50">
+    <TopNav />
+    
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <slot />
+    </main>
+  </div>
+</template>
+
+<script setup lang="ts">
+import TopNav from './TopNav.vue'
+</script>
+```
+
+### `resources/js/Components/Layout/TopNav.vue`
+
+```vue
+<template>
+  <nav class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <!-- Logo / Brand -->
+        <div class="flex items-center">
+          <Link href="/" class="flex items-center space-x-2">
+            <span class="text-2xl">📤</span>
+            <span class="text-xl font-bold text-gray-900">Text Commander</span>
+          </Link>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="hidden sm:flex sm:items-center sm:space-x-8">
+          <Link
+            href="/contacts"
+            :class="navLinkClass('/contacts')"
+          >
+            Contacts
+          </Link>
+          <Link
+            href="/logs"
+            :class="navLinkClass('/logs')"
+          >
+            Logs
+          </Link>
+          <Link
+            href="/settings"
+            :class="navLinkClass('/settings')"
+          >
+            Settings
+          </Link>
+
+          <!-- User Dropdown -->
+          <Menu as="div" class="relative">
+            <MenuButton class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+              <span>{{ user.name }}</span>
+              <ChevronDownIcon class="w-4 h-4" />
+            </MenuButton>
+            <transition
+              enter-active-class="transition duration-100 ease-out"
+              enter-from-class="transform scale-95 opacity-0"
+              enter-to-class="transform scale-100 opacity-100"
+              leave-active-class="transition duration-75 ease-in"
+              leave-from-class="transform scale-100 opacity-100"
+              leave-to-class="transform scale-95 opacity-0"
+            >
+              <MenuItems class="absolute right-0 mt-2 w-48 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div class="py-1">
+                  <MenuItem v-slot="{ active }">
+                    <Link
+                      href="/settings"
+                      :class="[active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700']"
+                    >
+                      Change Password
+                    </Link>
+                  </MenuItem>
+                  <MenuItem v-slot="{ active }">
+                    <Link
+                      href="/logout"
+                      method="post"
+                      as="button"
+                      :class="[active ? 'bg-gray-100' : '', 'block w-full text-left px-4 py-2 text-sm text-gray-700']"
+                    >
+                      Logout
+                    </Link>
+                  </MenuItem>
+                </div>
+              </MenuItems>
+            </transition>
+          </Menu>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="flex items-center sm:hidden">
+          <button
+            @click="mobileMenuOpen = !mobileMenuOpen"
+            class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100"
+          >
+            <Bars3Icon v-if="!mobileMenuOpen" class="w-6 h-6" />
+            <XMarkIcon v-else class="w-6 h-6" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div v-if="mobileMenuOpen" class="sm:hidden border-t border-gray-200">
+      <div class="pt-2 pb-3 space-y-1">
+        <Link
+          href="/contacts"
+          :class="mobileLinkClass('/contacts')"
+        >
+          Contacts
+        </Link>
+        <Link
+          href="/logs"
+          :class="mobileLinkClass('/logs')"
+        >
+          Logs
+        </Link>
+        <Link
+          href="/settings"
+          :class="mobileLinkClass('/settings')"
+        >
+          Settings
+        </Link>
+        <Link
+          href="/logout"
+          method="post"
+          as="button"
+          class="block w-full text-left px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100"
+        >
+          Logout
+        </Link>
+      </div>
+    </div>
+  </nav>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { Link, usePage } from '@inertiajs/vue3'
+import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
+import { ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
+import type { User } from '@/Types/models'
+
+const page = usePage()
+const user = computed(() => page.props.auth.user as User)
+
+const mobileMenuOpen = ref(false)
+
+const navLinkClass = (path: string) => {
+  const isActive = page.url.startsWith(path)
+  return [
+    'text-sm font-medium transition-colors',
+    isActive
+      ? 'text-blue-600'
+      : 'text-gray-700 hover:text-gray-900'
+  ]
+}
+
+const mobileLinkClass = (path: string) => {
+  const isActive = page.url.startsWith(path)
+  return [
+    'block px-4 py-2 text-base font-medium',
+    isActive
+      ? 'bg-blue-50 text-blue-600'
+      : 'text-gray-700 hover:bg-gray-100'
+  ]
+}
+</script>
+```
+
+---
+
+## Pages
+
+### `resources/js/Pages/Auth/Login.vue`
+
+```vue
+<template>
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div>
+        <div class="flex justify-center">
+          <span class="text-6xl">📤</span>
+        </div>
+        <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
+          Text Commander
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+          SMS Broadcasting System
+        </p>
+      </div>
+
+      <form @submit.prevent="submit" class="mt-8 space-y-6">
+        <div class="rounded-md shadow-sm space-y-4">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              id="email"
+              v-model="form.email"
+              type="email"
+              required
+              class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="admin@txtcmdr.local"
+            />
+            <div v-if="form.errors.email" class="mt-1 text-sm text-red-600">
+              {{ form.errors.email }}
+            </div>
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              id="password"
+              v-model="form.password"
+              type="password"
+              required
+              class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="••••••••"
+            />
+            <div v-if="form.errors.password" class="mt-1 text-sm text-red-600">
+              {{ form.errors.password }}
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          <input
+            id="remember"
+            v-model="form.remember"
+            type="checkbox"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <label for="remember" class="ml-2 block text-sm text-gray-900">
+            Remember me
+          </label>
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            :disabled="form.processing"
+            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ form.processing ? 'Logging in...' : 'Login' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useForm } from '@inertiajs/vue3'
+import type { LoginForm } from '@/Types/forms'
+
+const form = useForm<LoginForm>({
+  email: '',
+  password: '',
+  remember: false
+})
+
+const submit = () => {
+  form.post('/login')
+}
+</script>
+```
+
+### `resources/js/Pages/Dashboard.vue`
+
+```vue
+<template>
+  <AppLayout>
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-2xl font-bold text-gray-900 mb-6">📤 Send SMS</h1>
+
+      <Card>
+        <form @submit.prevent="sendNow">
+          <!-- To: Recipients -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              To:
+            </label>
+            <RecipientInput
+              v-model="form.recipients"
+              :contacts="contacts"
+              :groups="groups"
+            />
+          </div>
+
+          <!-- Message -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Message:
+            </label>
+            <MessageTextarea v-model="form.message" />
+          </div>
+
+          <!-- Footer: Character Count + Sender ID -->
+          <div class="mb-6 flex items-center justify-between">
+            <div class="text-sm text-gray-600">
+              {{ characterCount }}/160 ({{ smsCount }} SMS)
+            </div>
+            <SenderSelect v-model="form.senderId" :senders="senderIds" />
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-3">
+            <Button
+              type="submit"
+              :disabled="!canSend || form.processing"
+              variant="primary"
+              class="flex-1"
+            >
+              {{ form.processing ? 'Sending...' : 'Send Now' }}
+            </Button>
+            <Button
+              type="button"
+              @click="openScheduleModal"
+              :disabled="!canSend"
+              variant="secondary"
+              class="flex-1"
+            >
+              Schedule
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </div>
+
+    <!-- Schedule Modal -->
+    <ScheduleModal
+      :show="showScheduleModal"
+      :recipients="form.recipients"
+      :message="form.message"
+      :sender-id="form.senderId"
+      :recipient-count="recipientCount"
+      @close="showScheduleModal = false"
+      @success="handleScheduleSuccess"
+    />
+  </AppLayout>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useForm } from '@inertiajs/vue3'
+import AppLayout from '@/Components/Layout/AppLayout.vue'
+import Card from '@/Components/Shared/Card.vue'
+import Button from '@/Components/Shared/Button.vue'
+import RecipientInput from '@/Components/SMSComposer/RecipientInput.vue'
+import MessageTextarea from '@/Components/SMSComposer/MessageTextarea.vue'
+import SenderSelect from '@/Components/SMSComposer/SenderSelect.vue'
+import ScheduleModal from '@/Components/Shared/ScheduleModal.vue'
+import { useToast } from '@/Composables/useToast'
+import type { Contact, Group, SenderID } from '@/Types/models'
+import type { SMSComposerForm } from '@/Types/forms'
+
+interface Props {
+  contacts: Contact[]
+  groups: Group[]
+  senderIds: SenderID[]
+}
+
+const props = defineProps<Props>()
+const { showSuccess } = useToast()
+
+const form = useForm<SMSComposerForm>({
+  recipients: [],
+  message: '',
+  senderId: props.senderIds.find(s => s.is_default)?.name || 'TXTCMDR'
+})
+
+const showScheduleModal = ref(false)
+
+const characterCount = computed(() => form.message.length)
+const smsCount = computed(() => Math.ceil(characterCount.value / 160) || 1)
+const recipientCount = computed(() => form.recipients.length)
+const canSend = computed(() => form.recipients.length > 0 && form.message.trim().length > 0)
+
+const sendNow = () => {
+  form.post('/api/send', {
+    onSuccess: () => {
+      showSuccess('✓ Message sent!')
+      form.reset()
+    }
+  })
+}
+
+const openScheduleModal = () => {
+  showScheduleModal.value = true
+}
+
+const handleScheduleSuccess = () => {
+  showSuccess('✓ Message scheduled!')
+  form.reset()
+  showScheduleModal.value = false
+}
+</script>
+```
+
+### `resources/js/Pages/Contacts/Index.vue`
+
+```vue
+<template>
+  <AppLayout>
+    <div class="max-w-6xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Contacts</h1>
+        
+        <div class="flex gap-3">
+          <Button @click="showImportModal = true" variant="secondary">
+            Import CSV
+          </Button>
+          <Button @click="showAddModal = true" variant="primary">
+            + Add Contact
+          </Button>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="mb-6">
+        <Input
+          v-model="searchQuery"
+          type="search"
+          placeholder="Search contacts and groups..."
+          class="max-w-md"
+        />
+      </div>
+
+      <!-- Groups -->
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Groups</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <GroupCard
+            v-for="group in filteredGroups"
+            :key="group.id"
+            :group="group"
+            @send="handleSendToGroup"
+            @edit="handleEditGroup"
+          />
+        </div>
+      </div>
+
+      <!-- Recent Contacts -->
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Contacts</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ContactCard
+            v-for="contact in filteredContacts"
+            :key="contact.id"
+            :contact="contact"
+            @send="handleSendToContact"
+            @edit="handleEditContact"
+          />
+        </div>
+      </div>
+    </div>
+  </AppLayout>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { router } from '@inertiajs/vue3'
+import AppLayout from '@/Components/Layout/AppLayout.vue'
+import Button from '@/Components/Shared/Button.vue'
+import Input from '@/Components/Shared/Input.vue'
+import GroupCard from '@/Components/Contacts/GroupCard.vue'
+import ContactCard from '@/Components/Contacts/ContactCard.vue'
+import type { Contact, Group } from '@/Types/models'
+
+interface Props {
+  contacts: Contact[]
+  groups: Group[]
+}
+
+const props = defineProps<Props>()
+
+const searchQuery = ref('')
+const showAddModal = ref(false)
+const showImportModal = ref(false)
+
+const filteredGroups = computed(() => {
+  if (!searchQuery.value) return props.groups
+  return props.groups.filter(g => 
+    g.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+})
+
+const filteredContacts = computed(() => {
+  if (!searchQuery.value) return props.contacts
+  return props.contacts.filter(c => 
+    c.name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    c.mobile.includes(searchQuery.value)
+  )
+})
+
+const handleSendToGroup = (group: Group) => {
+  router.visit('/', {
+    data: { recipient: group.name }
+  })
+}
+
+const handleSendToContact = (contact: Contact) => {
+  router.visit('/', {
+    data: { recipient: contact.mobile }
+  })
+}
+
+const handleEditGroup = (group: Group) => {
+  router.visit(`/groups/${group.id}/edit`)
+}
+
+const handleEditContact = (contact: Contact) => {
+  router.visit(`/contacts/${contact.id}/edit`)
+}
+</script>
+```
+
+### `resources/js/Pages/Logs/Index.vue`
+
+```vue
+<template>
+  <AppLayout>
+    <div class="max-w-6xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Message Logs</h1>
+        
+        <div class="flex gap-2">
+          <select
+            v-model="statusFilter"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All</option>
+            <option value="pending">Scheduled</option>
+            <option value="sent">Sent</option>
+            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+
+          <select
+            v-model="dateFilter"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Messages List -->
+      <div class="space-y-4">
+        <Card
+          v-for="message in messages.data"
+          :key="message.id"
+          class="hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <!-- Status Badge + Recipient Summary -->
+              <div class="flex items-center gap-2 mb-2">
+                <span
+                  :class="statusBadgeClass(message.status)"
+                  class="px-2 py-1 text-xs font-medium rounded"
+                >
+                  {{ statusLabel(message.status) }}
+                </span>
+                <span class="text-sm text-gray-600">
+                  {{ message.total_recipients }} recipient(s)
+                </span>
+              </div>
+              
+              <!-- Message Content -->
+              <p class="text-gray-900 mb-2">{{ message.message }}</p>
+              
+              <!-- Timestamp + Sender ID -->
+              <div class="text-sm text-gray-600">
+                <span v-if="message.status === 'pending'">
+                  ⏱️ Scheduled for {{ formatDateTime(message.scheduled_at) }}
+                </span>
+                <span v-else-if="message.sent_at">
+                  ✓ Sent {{ formatDateTime(message.sent_at) }}
+                </span>
+                <span class="ml-3">From: {{ message.sender_id }}</span>
+              </div>
+            </div>
+
+            <!-- Actions for Scheduled Messages -->
+            <div v-if="message.status === 'pending'" class="flex gap-2 ml-4">
+              <Button
+                @click="editScheduledMessage(message.id)"
+                variant="secondary"
+                size="sm"
+              >
+                Edit
+              </Button>
+              <Button
+                @click="cancelScheduledMessage(message.id)"
+                variant="danger"
+                size="sm"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <!-- Pagination -->
+      <div v-if="messages.meta.last_page > 1" class="mt-6 flex justify-center">
+        <nav class="flex gap-2">
+          <Button
+            v-for="page in paginationRange"
+            :key="page"
+            @click="goToPage(page)"
+            :variant="page === messages.meta.current_page ? 'primary' : 'secondary'"
+            size="sm"
+          >
+            {{ page }}
+          </Button>
+        </nav>
+      </div>
+    </div>
+  </AppLayout>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { router } from '@inertiajs/vue3'
+import AppLayout from '@/Components/Layout/AppLayout.vue'
+import Card from '@/Components/Shared/Card.vue'
+import Button from '@/Components/Shared/Button.vue'
+import { useToast } from '@/Composables/useToast'
+import type { ScheduledMessage } from '@/Types/models'
+import type { PaginatedResponse } from '@/Types/api'
+import dayjs from 'dayjs'
+
+interface Props {
+  messages: PaginatedResponse<ScheduledMessage>
+}
+
+const props = defineProps<Props>()
+const { showSuccess, showError } = useToast()
+
+const statusFilter = ref('all')
+const dateFilter = ref('all')
+
+const paginationRange = computed(() => {
+  const current = props.messages.meta.current_page
+  const last = props.messages.meta.last_page
+  const delta = 2
+  const range = []
+  
+  for (let i = Math.max(2, current - delta); i <= Math.min(last - 1, current + delta); i++) {
+    range.push(i)
+  }
+  
+  if (current - delta > 2) range.unshift('...')
+  if (current + delta < last - 1) range.push('...')
+  
+  range.unshift(1)
+  if (last !== 1) range.push(last)
+  
+  return range
+})
+
+watch([statusFilter, dateFilter], () => {
+  router.get('/logs', {
+    status: statusFilter.value,
+    date: dateFilter.value
+  }, {
+    preserveState: true
+  })
+})
+
+const statusBadgeClass = (status: string) => {
+  const classes = {
+    pending: 'bg-yellow-100 text-yellow-800',
+    processing: 'bg-blue-100 text-blue-800',
+    sent: 'bg-green-100 text-green-800',
+    failed: 'bg-red-100 text-red-800',
+    cancelled: 'bg-gray-100 text-gray-800'
+  }
+  return classes[status] || 'bg-gray-100 text-gray-800'
+}
+
+const statusLabel = (status: string) => {
+  const labels = {
+    pending: '⏱️ Scheduled',
+    processing: '📤 Sending',
+    sent: '✓ Sent',
+    failed: '❌ Failed',
+    cancelled: '🚫 Cancelled'
+  }
+  return labels[status] || status
+}
+
+const formatDateTime = (dateTime: string) => {
+  return dayjs(dateTime).format('MMM D, YYYY [at] h:mm A')
+}
+
+const goToPage = (page: number | string) => {
+  if (typeof page === 'number') {
+    router.visit(`/logs?page=${page}`)
+  }
+}
+
+const editScheduledMessage = (id: number) => {
+  router.visit(`/scheduled-messages/${id}/edit`)
+}
+
+const cancelScheduledMessage = async (id: number) => {
+  if (!confirm('Cancel this scheduled message?')) return
+
+  try {
+    await axios.post(`/api/scheduled-messages/${id}/cancel`)
+    showSuccess('Message cancelled')
+    router.reload()
+  } catch (error) {
+    showError('Failed to cancel message')
+  }
+}
+</script>
+```
+
+### `resources/js/Pages/Settings/Index.vue`
+
+```vue
+<template>
+  <AppLayout>
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+
+      <!-- Account Settings -->
+      <Card class="mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Account</h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <p class="text-gray-900">{{ user.email }}</p>
+          </div>
+
+          <div>
+            <Button @click="showChangePasswordModal = true" variant="secondary">
+              Change Password
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      <!-- Sender IDs -->
+      <Card class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Sender IDs</h2>
+          <Button @click="showAddSenderModal = true" variant="secondary" size="sm">
+            + Add New
+          </Button>
+        </div>
+        
+        <div class="space-y-2">
+          <div
+            v-for="sender in senderIds"
+            :key="sender.id"
+            class="flex items-center justify-between py-2 px-3 border border-gray-200 rounded-lg"
+          >
+            <div class="flex items-center gap-2">
+              <span class="font-medium text-gray-900">{{ sender.name }}</span>
+              <span v-if="sender.is_default" class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                Default
+              </span>
+            </div>
+            <Button
+              v-if="!sender.is_default"
+              @click="setDefaultSender(sender.id)"
+              variant="secondary"
+              size="sm"
+            >
+              Set as Default
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      <!-- SMS Gateway -->
+      <Card>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">SMS Gateway</h2>
+        
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-700">Provider:</span>
+            <span class="font-medium text-gray-900">{{ gateway.provider }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-700">Status:</span>
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span class="text-sm font-medium text-green-700">Connected</span>
+            </span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-700">Balance:</span>
+            <span class="font-medium text-gray-900">₱{{ gateway.balance.toFixed(2) }}</span>
+          </div>
+        </div>
+      </Card>
+    </div>
+  </AppLayout>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { router } from '@inertiajs/vue3'
+import AppLayout from '@/Components/Layout/AppLayout.vue'
+import Card from '@/Components/Shared/Card.vue'
+import Button from '@/Components/Shared/Button.vue'
+import { useToast } from '@/Composables/useToast'
+import type { User, SenderID } from '@/Types/models'
+
+interface Props {
+  user: User
+  senderIds: SenderID[]
+  gateway: {
+    provider: string
+    balance: number
+  }
+}
+
+const props = defineProps<Props>()
+const { showSuccess } = useToast()
+
+const showChangePasswordModal = ref(false)
+const showAddSenderModal = ref(false)
+
+const setDefaultSender = async (id: number) => {
+  try {
+    await axios.post(`/api/sender-ids/${id}/set-default`)
+    showSuccess('Default sender updated')
+    router.reload()
+  } catch (error) {
+    console.error(error)
+  }
+}
+</script>
+```
+
+---
+
+## Components
+
+### `resources/js/Components/Shared/Button.vue`
+
+```vue
+<template>
+  <button
+    :type="type"
+    :disabled="disabled"
+    :class="classes"
+  >
+    <slot />
+  </button>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface Props {
+  type?: 'button' | 'submit' | 'reset'
+  variant?: 'primary' | 'secondary' | 'danger'
+  size?: 'sm' | 'md' | 'lg'
+  disabled?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  type: 'button',
+  variant: 'primary',
+  size: 'md',
+  disabled: false
+})
+
+const classes = computed(() => {
+  const base = 'font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+  
+  const variants = {
+    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+    secondary: 'bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 focus:ring-blue-500',
+    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
+  }
+  
+  const sizes = {
+    sm: 'px-3 py-1 text-sm',
+    md: 'px-6 py-3 text-base',
+    lg: 'px-8 py-4 text-lg'
+  }
+  
+  return [base, variants[props.variant], sizes[props.size]]
+})
+</script>
+```
+
+### `resources/js/Components/Shared/Input.vue`
+
+```vue
+<template>
+  <input
+    :type="type"
+    :value="modelValue"
+    @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+    :placeholder="placeholder"
+    :disabled="disabled"
+    :class="classes"
+  />
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface Props {
+  modelValue: string
+  type?: string
+  placeholder?: string
+  disabled?: boolean
+  error?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  type: 'text',
+  placeholder: '',
+  disabled: false,
+  error: false
+})
+
+defineEmits<{
+  'update:modelValue': [value: string]
+}>()
+
+const classes = computed(() => {
+  const base = 'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors'
+  const error = props.error
+    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+  
+  return [base, error]
+})
+</script>
+```
+
+### `resources/js/Components/Shared/Card.vue`
+
+```vue
+<template>
+  <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+    <slot />
+  </div>
+</template>
+
+<script setup lang="ts"></script>
+```
+
+---
+
+## Composables
+
+### `resources/js/Composables/useToast.ts`
+
+```typescript
+import { ref } from 'vue'
+
+interface Toast {
+  id: number
+  message: string
+  type: 'success' | 'error' | 'info'
+}
+
+const toasts = ref<Toast[]>([])
+let nextId = 0
+
+export function useToast() {
+  const showToast = (message: string, type: Toast['type'] = 'info') => {
+    const id = nextId++
+    toasts.value.push({ id, message, type })
+    
+    setTimeout(() => {
+      toasts.value = toasts.value.filter(t => t.id !== id)
+    }, 3000)
+  }
+
+  const showSuccess = (message: string) => showToast(message, 'success')
+  const showError = (message: string) => showToast(message, 'error')
+  const showInfo = (message: string) => showToast(message, 'info')
+
+  return {
+    toasts,
+    showToast,
+    showSuccess,
+    showError,
+    showInfo
+  }
+}
+```
+
+### `resources/js/Composables/useSMS.ts`
+
+```typescript
+import { ref } from 'vue'
+import axios from 'axios'
+import type { SendSMSRequest, SendSMSResponse, ScheduleSMSRequest, ScheduleSMSResponse } from '@/Types/api'
+
+export function useSMS() {
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  const sendSMS = async (data: SendSMSRequest): Promise<SendSMSResponse> => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await axios.post<SendSMSResponse>('/api/send', data)
+      return response.data
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to send SMS'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const scheduleSMS = async (data: ScheduleSMSRequest): Promise<ScheduleSMSResponse> => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await axios.post<ScheduleSMSResponse>('/api/send/schedule', data)
+      return response.data
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to schedule SMS'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    loading,
+    error,
+    sendSMS,
+    scheduleSMS
+  }
+}
+```
+
+### `resources/js/Composables/useContacts.ts`
+
+```typescript
+import { ref, computed } from 'vue'
+import axios from 'axios'
+import type { Contact, Group } from '@/Types/models'
+
+export function useContacts() {
+  const contacts = ref<Contact[]>([])
+  const groups = ref<Group[]>([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  const fetchContacts = async () => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await axios.get<Contact[]>('/api/contacts')
+      contacts.value = response.data
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to fetch contacts'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const fetchGroups = async () => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await axios.get<Group[]>('/api/groups')
+      groups.value = response.data
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to fetch groups'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const searchOptions = computed(() => {
+    const contactOptions = contacts.value.map(c => ({
+      label: c.name || c.mobile,
+      value: c.mobile,
+      type: 'contact' as const,
+      icon: '👤'
+    }))
+
+    const groupOptions = groups.value.map(g => ({
+      label: `${g.name} (${g.contacts_count})`,
+      value: g.name,
+      type: 'group' as const,
+      icon: '👥'
+    }))
+
+    return [...groupOptions, ...contactOptions]
+  })
+
+  return {
+    contacts,
+    groups,
+    loading,
+    error,
+    searchOptions,
+    fetchContacts,
+    fetchGroups
+  }
+}
+```
+
+### `resources/js/Composables/useAutocomplete.ts`
+
+```typescript
+import { ref, computed } from 'vue'
+
+export interface AutocompleteOption {
+  label: string
+  value: string
+  type: 'contact' | 'group' | 'number'
+  icon?: string
+}
+
+export function useAutocomplete(options: AutocompleteOption[]) {
+  const query = ref('')
+  const selected = ref<string[]>([])
+  const isOpen = ref(false)
+
+  const filteredOptions = computed(() => {
+    if (!query.value) return options
+
+    const lowerQuery = query.value.toLowerCase()
+    return options.filter(option =>
+      option.label.toLowerCase().includes(lowerQuery) ||
+      option.value.toLowerCase().includes(lowerQuery)
+    )
+  })
+
+  const addSelection = (value: string) => {
+    if (!selected.value.includes(value)) {
+      selected.value.push(value)
+    }
+    query.value = ''
+    isOpen.value = false
+  }
+
+  const removeSelection = (value: string) => {
+    selected.value = selected.value.filter(v => v !== value)
+  }
+
+  const clearAll = () => {
+    selected.value = []
+  }
+
+  return {
+    query,
+    selected,
+    isOpen,
+    filteredOptions,
+    addSelection,
+    removeSelection,
+    clearAll
+  }
+}
+```
+
+---
+
+## Configuration
+
+### `tsconfig.json`
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["resources/js/*"]
+    }
+  },
+  "include": ["resources/js/**/*.ts", "resources/js/**/*.d.ts", "resources/js/**/*.vue"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+```
+
+### `vite.config.ts`
+
+```typescript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import laravel from 'laravel-vite-plugin'
+import { fileURLToPath } from 'url'
+
+export default defineConfig({
+  plugins: [
+    laravel({
+      input: ['resources/css/app.css', 'resources/js/app.ts'],
+      refresh: true,
+    }),
+    vue({
+      template: {
+        transformAssetUrls: {
+          base: null,
+          includeAbsolute: false,
+        },
+      },
+    }),
+  ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./resources/js', import.meta.url)),
+    },
+  },
+})
+```
+
+### `resources/js/app.ts`
+
+```typescript
+import './bootstrap'
+import '../css/app.css'
+
+import { createApp, h, DefineComponent } from 'vue'
+import { createInertiaApp } from '@inertiajs/vue3'
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
+import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m'
+
+const appName = import.meta.env.VITE_APP_NAME || 'Text Commander'
+
+createInertiaApp({
+  title: (title) => `${title} - ${appName}`,
+  resolve: (name) =>
+    resolvePageComponent(
+      `./Pages/${name}.vue`,
+      import.meta.glob<DefineComponent>('./Pages/**/*.vue')
+    ),
+  setup({ el, App, props, plugin }) {
+    createApp({ render: () => h(App, props) })
+      .use(plugin)
+      .use(ZiggyVue)
+      .mount(el)
+  },
+  progress: {
+    color: '#2563EB',
+  },
+})
+```
+
+---
+
+## Related Documentation
+
+- [UI/UX Design](ui-ux-design.md) - Design specifications and mockups
+- [Backend Services](backend-services.md) - API Actions and endpoints
+- [Scheduled Messaging](scheduled-messaging.md) - Scheduling feature implementation
+- [Development Plan](development-plan.md) - Implementation roadmap

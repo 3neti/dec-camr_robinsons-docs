@@ -31,6 +31,8 @@ resources/
 │   │   │   └── edit.vue
 │   │   ├── logs/
 │   │   │   └── index.vue
+│   │   ├── blacklist/
+│   │   │   └── index.vue
 │   │   └── settings/
 │   │       └── index.vue
 │   ├── components/
@@ -46,9 +48,11 @@ resources/
 │   │   │   ├── input.vue
 │   │   │   ├── card.vue
 │   │   │   └── schedule-modal.vue
-│   │   └── contacts/
-│   │       ├── contact-card.vue
-│   │       └── group-card.vue
+│   │   ├── contacts/
+│   │   │   ├── contact-card.vue
+│   │   │   └── group-card.vue
+│   │   └── blacklist/
+│   │       └── add-blacklist-modal.vue
 │   ├── composables/
 │   │   ├── use-contacts.ts
 │   │   ├── use-sms.ts
@@ -149,6 +153,16 @@ export interface SMSLog {
   sent_at?: string
   error?: string
   created_at: string
+}
+
+export interface BlacklistedNumber {
+  id: number
+  mobile: string
+  reason: string
+  added_by: string | null
+  blocked_at: string
+  created_at: string
+  updated_at: string
 }
 ```
 
@@ -1434,6 +1448,316 @@ export function useAutocomplete(options: AutocompleteOption[]) {
     clearAll
   }
 }
+```
+
+---
+
+## Blacklist Management Pages
+
+### `resources/js/pages/blacklist/index.vue`
+
+```vue
+<template>
+  <app-layout>
+    <div class="max-w-6xl mx-auto p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">🚫 Blacklisted Numbers</h1>
+        <button
+          @click="showAddModal = true"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Add Number
+        </button>
+      </div>
+
+      <!-- Search & Filter -->
+      <div class="mb-6 flex gap-4">
+        <input
+          v-model="filters.search"
+          @input="search"
+          type="text"
+          placeholder="Search mobile number..."
+          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+        <select
+          v-model="filters.reason"
+          @change="search"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">All Reasons</option>
+          <option value="opt-out">Opt-out</option>
+          <option value="complaint">Complaint</option>
+          <option value="invalid">Invalid</option>
+          <option value="manual">Manual</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Mobile Number
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Reason
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Added By
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Blocked At
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="item in blacklisted.data" :key="item.id">
+              <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">
+                {{ item.mobile }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ item.reason }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ item.added_by || '—' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ formatDate(item.blocked_at) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <button
+                  @click="removeNumber(item.mobile)"
+                  class="text-red-600 hover:text-red-900"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="mt-4 flex justify-between items-center">
+        <div class="text-sm text-gray-700">
+          Showing {{ blacklisted.from }} to {{ blacklisted.to }} of {{ blacklisted.total }}
+        </div>
+        <div class="flex gap-2">
+          <button
+            v-for="link in blacklisted.links"
+            :key="link.label"
+            @click="goToPage(link.url)"
+            :disabled="!link.url"
+            :class="[
+              'px-3 py-1 rounded',
+              link.active ? 'bg-blue-600 text-white' : 'bg-white border hover:bg-gray-50',
+              !link.url && 'opacity-50 cursor-not-allowed'
+            ]"
+            v-html="link.label"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Modal -->
+    <add-blacklist-modal
+      :show="showAddModal"
+      @close="showAddModal = false"
+      @success="handleAdded"
+    />
+  </app-layout>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive } from 'vue'
+import { router } from '@inertiajs/vue3'
+import AppLayout from '@/layouts/app-layout.vue'
+import AddBlacklistModal from '@/components/blacklist/add-blacklist-modal.vue'
+import dayjs from 'dayjs'
+import type { BlacklistedNumber } from '@/types/models'
+
+interface Props {
+  blacklisted: {
+    data: BlacklistedNumber[]
+    from: number
+    to: number
+    total: number
+    links: Array<{ label: string; url: string | null; active: boolean }>
+  }
+}
+
+const props = defineProps<Props>()
+
+const showAddModal = ref(false)
+
+const filters = reactive({
+  search: '',
+  reason: '',
+})
+
+const search = () => {
+  router.get('/blacklist', filters, { preserveState: true })
+}
+
+const removeNumber = async (mobile: string) => {
+  if (!confirm(`Remove ${mobile} from blacklist?`)) return
+
+  try {
+    await axios.delete('/api/blacklist', { data: { mobile } })
+    router.reload()
+  } catch (error) {
+    alert('Failed to remove number')
+  }
+}
+
+const handleAdded = () => {
+  showAddModal.value = false
+  router.reload()
+}
+
+const goToPage = (url: string | null) => {
+  if (url) router.visit(url)
+}
+
+const formatDate = (date: string) => {
+  return dayjs(date).format('MMM D, YYYY h:mm A')
+}
+</script>
+```
+
+---
+
+### `resources/js/components/blacklist/add-blacklist-modal.vue`
+
+```vue
+<template>
+  <TransitionRoot :show="show" as="template">
+    <Dialog as="div" class="relative z-50" @close="close">
+      <TransitionChild
+        enter="ease-out duration-300"
+        enter-from="opacity-0"
+        enter-to="opacity-100"
+        leave="ease-in duration-200"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
+      >
+        <div class="fixed inset-0 bg-black bg-opacity-25" />
+      </TransitionChild>
+
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <TransitionChild
+            enter="ease-out duration-300"
+            enter-from="opacity-0 scale-95"
+            enter-to="opacity-100 scale-100"
+            leave="ease-in duration-200"
+            leave-from="opacity-100 scale-100"
+            leave-to="opacity-0 scale-95"
+          >
+            <DialogPanel class="w-full max-w-md bg-white rounded-lg p-6 shadow-xl">
+              <DialogTitle class="text-lg font-bold mb-4">
+                Add to Blacklist
+              </DialogTitle>
+
+              <form @submit.prevent="submit">
+                <!-- Mobile Number -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Mobile Number
+                  </label>
+                  <input
+                    v-model="form.mobile"
+                    type="text"
+                    required
+                    placeholder="0917 123 4567"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <!-- Reason -->
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Reason
+                  </label>
+                  <select
+                    v-model="form.reason"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="opt-out">User opted out</option>
+                    <option value="complaint">Complaint received</option>
+                    <option value="invalid">Invalid number</option>
+                    <option value="manual">Manual addition</option>
+                  </select>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3">
+                  <button
+                    type="button"
+                    @click="close"
+                    class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    :disabled="processing"
+                    class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                  >
+                    {{ processing ? 'Adding...' : 'Add to Blacklist' }}
+                  </button>
+                </div>
+              </form>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive } from 'vue'
+import { Dialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild } from '@headlessui/vue'
+import axios from 'axios'
+
+interface Props {
+  show: boolean
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits(['close', 'success'])
+
+const processing = ref(false)
+
+const form = reactive({
+  mobile: '',
+  reason: 'opt-out',
+})
+
+const submit = async () => {
+  processing.value = true
+
+  try {
+    await axios.post('/api/blacklist', form)
+    emit('success')
+    form.mobile = ''
+    form.reason = 'opt-out'
+  } catch (error) {
+    alert('Failed to add number to blacklist')
+  } finally {
+    processing.value = false
+  }
+}
+
+const close = () => {
+  emit('close')
+}
+</script>
 ```
 
 ---

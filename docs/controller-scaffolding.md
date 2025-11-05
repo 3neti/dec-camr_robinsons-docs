@@ -351,10 +351,11 @@ class SettingsController extends Controller
 ### `routes/web.php`
 
 ```php
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\BlacklistController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -391,6 +392,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Logs
     Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
+
+    // Blacklist
+    Route::get('/blacklist', [BlacklistController::class, 'index'])->name('blacklist.index');
 
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
@@ -562,6 +566,49 @@ class GroupController extends Controller
 }
 ```
 
+### `app/Http/Controllers/BlacklistController.php`
+
+**Route:** `GET /blacklist`
+
+**Purpose:** Show blacklist management page with search and filtering
+
+```php
+namespace App\Http\Controllers;
+
+use App\Models\BlacklistedNumber;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class BlacklistController extends Controller
+{
+    public function index(Request $request): Response
+    {
+        $query = $request->query('search');
+        $reason = $request->query('reason');
+
+        $blacklisted = BlacklistedNumber::query()
+            ->when($query, function ($q) use ($query) {
+                $q->where('mobile', 'like', "%{$query}%");
+            })
+            ->when($reason, function ($q) use ($reason) {
+                $q->where('reason', $reason);
+            })
+            ->orderBy('blocked_at', 'desc')
+            ->paginate(50)
+            ->withQueryString();
+
+        return Inertia::render('blacklist/index', [
+            'blacklisted' => $blacklisted,
+            'search' => $query,
+            'reason' => $reason,
+        ]);
+    }
+}
+```
+
+---
+
 ### `app/Http/Controllers/ScheduledMessageController.php`
 
 **Route:** `GET /scheduled-messages/{id}/edit`
@@ -697,12 +744,13 @@ class LoginControllerTest extends TestCase
 
 ## Summary
 
-### Inertia Controllers (5 controllers)
+### Inertia Controllers (6 controllers)
 1. **DashboardController** - SMS composer with initial data
 2. **LoginController** - Authentication (show form, login, logout)
 3. **ContactController** - Contacts and groups listing
 4. **LogController** - Message history with filters
-5. **SettingsController** - Settings page with account info
+5. **BlacklistController** - Blacklist management with search/filter
+6. **SettingsController** - Settings page with account info
 
 ### API Actions (14 endpoints)
 - All use `ActionRequest` with `asController()` method

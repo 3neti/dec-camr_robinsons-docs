@@ -41,7 +41,7 @@ namespace App\Actions;
 use App\Jobs\SendSMSJob;
 use App\Models\Contact;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Propaganistas\LaravelPhone\PhoneNumber;
 
@@ -88,18 +88,21 @@ class SendToMultipleRecipients
         ];
     }
 
-    public function asController(Request $request): JsonResponse
+    public function rules(): array
     {
-        $validated = $request->validate([
+        return [
             'recipients' => 'required',
             'message' => 'required|string|max:1600',
             'sender_id' => 'nullable|string|max:11',
-        ]);
+        ];
+    }
 
+    public function asController(ActionRequest $request): JsonResponse
+    {
         $result = $this->handle(
-            $validated['recipients'],
-            $validated['message'],
-            $validated['sender_id'] ?? null
+            $request->recipients,
+            $request->message,
+            $request->sender_id ?? null
         );
 
         return response()->json($result, 200);
@@ -141,7 +144,7 @@ namespace App\Actions;
 use App\Jobs\BroadcastToGroupJob;
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class SendToMultipleGroups
@@ -195,18 +198,21 @@ class SendToMultipleGroups
         ];
     }
 
-    public function asController(Request $request): JsonResponse
+    public function rules(): array
     {
-        $validated = $request->validate([
+        return [
             'groups' => 'required',
             'message' => 'required|string|max:1600',
             'sender_id' => 'nullable|string|max:11',
-        ]);
+        ];
+    }
 
+    public function asController(ActionRequest $request): JsonResponse
+    {
         $result = $this->handle(
-            $validated['groups'],
-            $validated['message'],
-            $validated['sender_id'] ?? null
+            $request->groups,
+            $request->message,
+            $request->sender_id ?? null
         );
 
         return response()->json($result, 200);
@@ -246,7 +252,7 @@ namespace App\Actions\Groups;
 
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateGroup
@@ -261,16 +267,19 @@ class CreateGroup
         ]);
     }
 
-    public function asController(Request $request): JsonResponse
+    public function rules(): array
     {
-        $validated = $request->validate([
+        return [
             'name' => 'required|string|max:255|unique:groups,name',
             'description' => 'nullable|string|max:500',
-        ]);
+        ];
+    }
 
+    public function asController(ActionRequest $request): JsonResponse
+    {
         $group = $this->handle(
-            $validated['name'],
-            $validated['description'] ?? null
+            $request->name,
+            $request->description ?? null
         );
 
         return response()->json($group, 201);
@@ -292,7 +301,7 @@ namespace App\Actions\Groups;
 
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class ListGroups
@@ -306,7 +315,7 @@ class ListGroups
             ->get();
     }
 
-    public function asController(Request $request): JsonResponse
+    public function asController(ActionRequest $request): JsonResponse
     {
         $groups = $this->handle();
 
@@ -373,7 +382,7 @@ namespace App\Actions\Groups;
 
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateGroup
@@ -388,14 +397,17 @@ class UpdateGroup
         return $group->fresh();
     }
 
-    public function asController(Request $request, int $id): JsonResponse
+    public function rules(): array
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255|unique:groups,name,' . $id,
+        return [
+            'name' => 'sometimes|string|max:255|unique:groups,name,' . $this->route('id'),
             'description' => 'nullable|string|max:500',
-        ]);
+        ];
+    }
 
-        $group = $this->handle($id, $validated);
+    public function asController(ActionRequest $request, int $id): JsonResponse
+    {
+        $group = $this->handle($id, $request->validated());
 
         return response()->json($group, 200);
     }
@@ -466,8 +478,8 @@ namespace App\Actions\Contacts;
 use App\Models\Contact;
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use LBHurtado\Contact\Data\ContactData;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Propaganistas\LaravelPhone\PhoneNumber;
 
@@ -507,20 +519,23 @@ class AddContactToGroup
         return $contact;
     }
 
-    public function asController(Request $request, int $id): JsonResponse
+    public function rules(): array
     {
-        $validated = $request->validate([
+        return [
             'mobile' => 'required|phone:PH',
             'name' => 'nullable|string|max:255',
             'tags' => 'nullable|array',
             'tags.*' => 'string',
-        ]);
+        ];
+    }
 
+    public function asController(ActionRequest $request, int $id): JsonResponse
+    {
         $contact = $this->handle(
             $id,
-            $validated['mobile'],
-            $validated['name'] ?? null,
-            $validated['tags'] ?? []
+            $request->mobile,
+            $request->name ?? null,
+            $request->tags ?? []
         );
 
         return response()->json(
@@ -555,8 +570,8 @@ namespace App\Actions\Contacts;
 use App\Models\Contact;
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use LBHurtado\Contact\Data\ContactData;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Propaganistas\LaravelPhone\PhoneNumber;
 
@@ -601,21 +616,24 @@ class UpdateContactInGroup
         return $contact->fresh();
     }
 
-    public function asController(Request $request, int $groupId, int $contactId): JsonResponse
+    public function rules(): array
     {
-        $validated = $request->validate([
+        return [
             'mobile' => 'sometimes|phone:PH',
             'name' => 'nullable|string|max:255',
             'tags' => 'nullable|array',
             'tags.*' => 'string',
-        ]);
+        ];
+    }
 
+    public function asController(ActionRequest $request, int $groupId, int $contactId): JsonResponse
+    {
         $contact = $this->handle(
             $groupId,
             $contactId,
-            $validated['mobile'] ?? null,
-            $validated['name'] ?? null,
-            $validated['tags'] ?? null
+            $request->mobile ?? null,
+            $request->name ?? null,
+            $request->tags ?? null
         );
 
         return response()->json(

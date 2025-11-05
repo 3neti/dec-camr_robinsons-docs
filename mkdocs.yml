@@ -1,0 +1,85 @@
+site_name: Text Commander Documentation
+site_description: Fast-deployable SMS broadcasting system with branded sender ID
+site_url: https://txtcmdr.docs
+site_author: 3neti R&D OPC
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - navigation.footer
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - search.suggest
+    - search.highlight
+    - toc.follow
+
+nav:
+  - Home: index.md
+  - Plans:
+    - Business Plan: business-plan.md
+    - Development Plan: development-plan.md
+    - Marketing Plan: marketing-plan.md
+    - Fundraising Plan: fundraising-plan.md
+  - Technical Reference:
+    - Backend Services: backend-services.md
+    - Interfaces & DTOs: interfaces-and-dtos.md
+    - API Documentation: api-documentation.md
+    - UI/UX Design: ui-ux-design.md
+    - Wireframes: wireframes.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - codehilite
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com

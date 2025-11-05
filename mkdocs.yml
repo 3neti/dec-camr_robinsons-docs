@@ -38,27 +38,48 @@ theme:
 
 nav:
   - Home: index.md
-  - Quick Start: quick-start.md
-  - Plans:
-    - Business Plan: business-plan.md
-    - Development Plan: development-plan.md
-    - Marketing Plan: marketing-plan.md
-    - Fundraising Plan: fundraising-plan.md
-  - Technical Reference:
+  - Getting Started:
+    - Quick Start: quick-start.md
     - Package Architecture: package-architecture.md
-    - Backend Services: backend-services.md
-    - SMS Integration: sms-integration.md
+  - Development Plan: development-plan.md
+  - Core Features:
+    - SMS Broadcasting:
+      - SMS Integration: sms-integration.md
+      - Phone Normalization: phone-normalization.md
     - Scheduled Messaging: scheduled-messaging.md
-    - Blacklist Feature: blacklist-feature.md
-    - Phone Normalization: phone-normalization.md
-    - Contact Package: contact-package.md
-    - Interfaces & DTOs: interfaces-and-dtos.md
+    - Blacklist (No-Send List): blacklist-feature.md
+    - Group Management: group-management.md
+    - Contact Management: contact-package.md
+  - API Reference:
     - API Documentation: api-documentation.md
-    - UI/UX Design: ui-ux-design.md
-    - Frontend Scaffolding: frontend-scaffolding.md
+    - Interfaces & DTOs: interfaces-and-dtos.md
+  - Database:
+    - Database Schema: database-schema.md
+  - Backend Architecture:
+    - Backend Services: backend-services.md
+    - Models: models.md
+    - Jobs & Commands: jobs-commands.md
+    - Middleware: middleware.md
+  - Controllers:
     - Controller Scaffolding: controller-scaffolding.md
-    - Test Scaffolding: test-scaffolding.md
+  - Frontend:
+    - Frontend Scaffolding: frontend-scaffolding.md
+    - UI/UX Design: ui-ux-design.md
     - Wireframes: wireframes.md
+  - Testing:
+    - Test Scaffolding: test-scaffolding.md
+  - Third-Party Packages:
+    - Package Overview: packages.md
+  - Security & Compliance:
+    - Security Guide: security.md
+  - Operations:
+    - Jobs, Events & Listeners: events-listeners.md
+    - Notifications: notifications.md
+    - Logging & Monitoring: logging-monitoring.md
+    - DevOps & Deployment: deployment.md
+  - Appendices:
+    - Reference Guide: appendices.md
+    - Documentation TODO: TODO-SECTIONS.md
 
 markdown_extensions:
   - admonition

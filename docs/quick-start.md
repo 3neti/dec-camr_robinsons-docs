@@ -461,7 +461,7 @@ engageSPARK has rate limits. If hitting limits:
 - **Read full architecture:** [Package Architecture](package-architecture.md)
 - **Explore backend services:** [Backend Services](backend-services.md)
 - **Review API endpoints:** [API Documentation](api-documentation.md)
-- **Check business plan:** [Business Plan](business-plan.md)
+- **Review development plan:** [Development Plan](development-plan.md)
 
 ## Getting Help
 

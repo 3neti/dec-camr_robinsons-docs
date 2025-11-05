@@ -7,11 +7,31 @@ This document outlines the Laravel Actions, Controllers, and Services that power
 ## Table of Contents
 
 - [SMS Broadcasting Actions](#sms-broadcasting-actions)
+  - [SendToMultipleRecipients](#sendtomultiplerecipients)
+  - [SendToMultipleGroups](#sendtomultiplegroups)
 - [Group Management Actions](#group-management-actions)
+  - [CreateGroup](#creategroup)
+  - [ListGroups](#listgroups)
+  - [GetGroup](#getgroup)
+  - [UpdateGroup](#updategroup)
+  - [DeleteGroup](#deletegroup)
 - [Contact Management Actions](#contact-management-actions)
+  - [AddContactToGroup](#addcontacttogroup)
+  - [UpdateContactInGroup](#updatecontactingroup)
+  - [DeleteContactFromGroup](#deletecontactfromgroup)
+  - [ListGroupContacts](#listgroupcontacts)
+  - [ContactResource](#contactresource)
 - [Supporting Services](#supporting-services)
+  - [SMSService](#smsservice)
+  - [ContactNormalizationService](#contactnormalizationservice)
 - [Jobs](#jobs)
+  - [SendSMSJob](#sendsmsjob)
+  - [BroadcastToGroupJob](#broadcasttogroupjob)
+  - [ProcessScheduledMessage](#processscheduledmessage)
+  - [ContactImportJob](#contactimportjob)
 - [Console Commands](#console-commands)
+  - [ProcessScheduledMessages](#processscheduledmessages)
+  - [SendScheduledBroadcasts](#sendscheduledbroadcasts)
 
 ---
 
@@ -918,7 +938,94 @@ class ContactNormalizationService
 
 **Location:** `app/Jobs/SendSMSJob.php`
 
-**Description:** Queued job for sending individual SMS. See [SMS Integration](sms-integration.md) for full implementation.
+**Description:** Queued job for sending individual SMS messages.
+
+**Queue:** `default`
+
+**Retry:** 3 attempts
+
+**Properties:**
+- `$mobile` (string) - Recipient phone number in E.164 format
+- `$message` (string) - SMS content
+- `$senderId` (string) - Branded sender ID
+
+**Implementation:**
+```php
+namespace App\Jobs;
+
+use App\Services\SMSService;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use LBHurtado\SMS\Facades\SMS;
+
+class SendSMSJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 3;
+    public int $timeout = 30;
+
+    public function __construct(
+        public string $mobile,
+        public string $message,
+        public string $senderId
+    ) {}
+
+    public function handle(SMSService $smsService): void
+    {
+        try {
+            $smsService->send(
+                $this->mobile,
+                $this->message,
+                $this->senderId
+            );
+
+            Log::info('SMS sent successfully', [
+                'mobile' => $this->mobile,
+                'sender_id' => $this->senderId,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('SMS send failed', [
+                'mobile' => $this->mobile,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e; // Retry
+        }
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('SMS job failed after all retries', [
+            'mobile' => $this->mobile,
+            'exception' => $exception->getMessage(),
+        ]);
+    }
+}
+```
+
+**Usage:**
+```php
+use App\Jobs\SendSMSJob;
+
+SendSMSJob::dispatch(
+    '+639171234567',
+    'Your message here',
+    'TXTCMDR'
+);
+
+// Delay sending
+SendSMSJob::dispatch($mobile, $message, $senderId)
+    ->delay(now()->addMinutes(5));
+
+// Set specific queue
+SendSMSJob::dispatch($mobile, $message, $senderId)
+    ->onQueue('high-priority');
+```
 
 ---
 
@@ -926,7 +1033,251 @@ class ContactNormalizationService
 
 **Location:** `app/Jobs/BroadcastToGroupJob.php`
 
-**Description:** Queued job for broadcasting to all contacts in a group. See [SMS Integration](sms-integration.md) for full implementation.
+**Description:** Queued job for broadcasting SMS to all contacts in a group.
+
+**Queue:** `broadcasts`
+
+**Retry:** 2 attempts
+
+**Properties:**
+- `$groupId` (int) - Group ID
+- `$message` (string) - SMS content
+- `$senderId` (string) - Branded sender ID
+
+**Implementation:**
+```php
+namespace App\Jobs;
+
+use App\Models\Group;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+
+class BroadcastToGroupJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 2;
+    public int $timeout = 300; // 5 minutes for large groups
+
+    public function __construct(
+        public int $groupId,
+        public string $message,
+        public string $senderId
+    ) {}
+
+    public function handle(): void
+    {
+        $group = Group::with('contacts')->findOrFail($this->groupId);
+
+        $contactCount = $group->contacts->count();
+
+        Log::info('Starting group broadcast', [
+            'group_id' => $this->groupId,
+            'group_name' => $group->name,
+            'contact_count' => $contactCount,
+        ]);
+
+        foreach ($group->contacts as $contact) {
+            SendSMSJob::dispatch(
+                $contact->e164_mobile,
+                $this->message,
+                $this->senderId
+            );
+        }
+
+        Log::info('Group broadcast dispatched', [
+            'group_id' => $this->groupId,
+            'messages_dispatched' => $contactCount,
+        ]);
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('Broadcast job failed', [
+            'group_id' => $this->groupId,
+            'exception' => $exception->getMessage(),
+        ]);
+    }
+}
+```
+
+**Usage:**
+```php
+use App\Jobs\BroadcastToGroupJob;
+
+BroadcastToGroupJob::dispatch(
+    groupId: 1,
+    message: 'Emergency alert',
+    senderId: 'QUEZON_CITY'
+);
+
+// Dispatch to specific queue
+BroadcastToGroupJob::dispatch($groupId, $message, $senderId)
+    ->onQueue('broadcasts');
+```
+
+---
+
+### ProcessScheduledMessage
+
+**Location:** `app/Jobs/ProcessScheduledMessage.php`
+
+**Description:** Processes a single scheduled message by dispatching SMS jobs to all recipients.
+
+**Queue:** `scheduled`
+
+**Retry:** 1 attempt (non-retryable to prevent duplicate sends)
+
+**Properties:**
+- `$scheduledMessageId` (int) - ScheduledMessage ID
+
+**Implementation:**
+```php
+namespace App\Jobs;
+
+use App\Models\Group;
+use App\Models\ScheduledMessage;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Propaganistas\LaravelPhone\PhoneNumber;
+
+class ProcessScheduledMessage implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 1; // Don't retry to prevent duplicates
+    public int $timeout = 300;
+
+    public function __construct(
+        public int $scheduledMessageId
+    ) {}
+
+    public function handle(): void
+    {
+        $message = ScheduledMessage::findOrFail($this->scheduledMessageId);
+
+        // Verify message is still pending
+        if ($message->status !== 'pending') {
+            Log::warning('Attempted to process non-pending message', [
+                'id' => $message->id,
+                'status' => $message->status,
+            ]);
+            return;
+        }
+
+        // Update status to processing
+        $message->update(['status' => 'processing']);
+
+        DB::beginTransaction();
+
+        try {
+            $recipients = $this->getRecipients($message);
+            $dispatchedCount = 0;
+            $failedCount = 0;
+            $errors = [];
+
+            foreach ($recipients as $recipient) {
+                try {
+                    SendSMSJob::dispatch(
+                        $recipient,
+                        $message->message,
+                        $message->sender_id
+                    );
+                    $dispatchedCount++;
+                } catch (\Exception $e) {
+                    $failedCount++;
+                    $errors[] = [
+                        'number' => $recipient,
+                        'error' => $e->getMessage(),
+                    ];
+                }
+            }
+
+            // Update message status
+            $message->update([
+                'status' => $failedCount > 0 ? 'partially_sent' : 'sent',
+                'sent_at' => now(),
+                'sent_count' => $dispatchedCount,
+                'failed_count' => $failedCount,
+                'errors' => $failedCount > 0 ? $errors : null,
+            ]);
+
+            DB::commit();
+
+            Log::info('Scheduled message processed', [
+                'id' => $message->id,
+                'dispatched' => $dispatchedCount,
+                'failed' => $failedCount,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            $message->update([
+                'status' => 'failed',
+                'errors' => [['error' => $e->getMessage()]],
+            ]);
+
+            Log::error('Failed to process scheduled message', [
+                'id' => $message->id,
+                'exception' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    private function getRecipients(ScheduledMessage $message): array
+    {
+        $recipients = [];
+        $recipientData = $message->recipient_data;
+
+        // Direct numbers
+        if (!empty($recipientData['numbers'])) {
+            foreach ($recipientData['numbers'] as $number) {
+                try {
+                    $phone = new PhoneNumber($number, 'PH');
+                    $recipients[] = $phone->formatE164();
+                } catch (\Exception $e) {
+                    Log::warning('Invalid phone number in scheduled message', [
+                        'number' => $number,
+                        'message_id' => $message->id,
+                    ]);
+                }
+            }
+        }
+
+        // Groups
+        if (!empty($recipientData['groups'])) {
+            foreach ($recipientData['groups'] as $groupData) {
+                $group = Group::with('contacts')->find($groupData['id']);
+                if ($group) {
+                    foreach ($group->contacts as $contact) {
+                        $recipients[] = $contact->e164_mobile;
+                    }
+                }
+            }
+        }
+
+        return array_unique($recipients);
+    }
+}
+```
+
+**Usage:**
+```php
+use App\Jobs\ProcessScheduledMessage;
+
+ProcessScheduledMessage::dispatch($scheduledMessageId);
+```
 
 ---
 
@@ -934,7 +1285,11 @@ class ContactNormalizationService
 
 **Location:** `app/Jobs/ContactImportJob.php`
 
-**Description:** Parses and imports contacts from CSV/Excel files.
+**Description:** Parses and imports contacts from CSV/Excel files into a group.
+
+**Queue:** `imports`
+
+**Retry:** 1 attempt
 
 **Supported Formats:**
 - CSV (`,` or `;` delimiter)
@@ -945,21 +1300,232 @@ class ContactNormalizationService
 - `name` (optional) - Contact name
 - `tags` (optional) - Comma-separated tags
 
+**Implementation:**
+```php
+namespace App\Jobs;
+
+use App\Models\Contact;
+use App\Models\Group;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use League\Csv\Reader;
+use Propaganistas\LaravelPhone\PhoneNumber;
+
+class ContactImportJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 1;
+    public int $timeout = 600; // 10 minutes for large files
+
+    public function __construct(
+        public int $groupId,
+        public string $filePath
+    ) {}
+
+    public function handle(): void
+    {
+        $group = Group::findOrFail($this->groupId);
+        $fileContent = Storage::get($this->filePath);
+
+        $csv = Reader::createFromString($fileContent);
+        $csv->setHeaderOffset(0);
+
+        $imported = 0;
+        $failed = 0;
+        $errors = [];
+
+        foreach ($csv as $index => $row) {
+            try {
+                if (empty($row['mobile'])) {
+                    $failed++;
+                    $errors[] = "Row {$index}: Missing mobile number";
+                    continue;
+                }
+
+                $phone = new PhoneNumber($row['mobile'], 'PH');
+                $contact = Contact::fromPhoneNumber($phone);
+
+                // Set name if provided
+                if (!empty($row['name'])) {
+                    $contact->setMeta('name', $row['name']);
+                }
+
+                // Set tags if provided
+                if (!empty($row['tags'])) {
+                    $tags = array_map('trim', explode(',', $row['tags']));
+                    $contact->setTags($tags);
+                }
+
+                $contact->save();
+
+                // Attach to group
+                if (!$group->contacts->contains($contact)) {
+                    $group->contacts()->attach($contact->id);
+                }
+
+                $imported++;
+            } catch (\Exception $e) {
+                $failed++;
+                $errors[] = "Row {$index}: {$e->getMessage()}";
+            }
+        }
+
+        // Clean up file
+        Storage::delete($this->filePath);
+
+        Log::info('Contact import completed', [
+            'group_id' => $this->groupId,
+            'imported' => $imported,
+            'failed' => $failed,
+        ]);
+
+        if ($failed > 0) {
+            Log::warning('Contact import had errors', [
+                'errors' => $errors,
+            ]);
+        }
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('Contact import job failed', [
+            'group_id' => $this->groupId,
+            'file_path' => $this->filePath,
+            'exception' => $exception->getMessage(),
+        ]);
+
+        // Clean up file
+        Storage::delete($this->filePath);
+    }
+}
+```
+
+**Usage:**
+```php
+use App\Jobs\ContactImportJob;
+
+// Upload file first
+$path = $request->file('csv')->store('imports');
+
+// Dispatch import job
+ContactImportJob::dispatch(
+    groupId: 1,
+    filePath: $path
+)->onQueue('imports');
+```
+
 ---
 
 ## Console Commands
+
+### ProcessScheduledMessages
+
+**Location:** `app/Console/Commands/ProcessScheduledMessages.php`
+
+**Signature:** `messages:process-scheduled`
+
+**Schedule:** Runs every minute
+
+**Description:** Processes scheduled messages that are ready to be sent (scheduled_at <= now()).
+
+**Logic:**
+1. Query `scheduled_messages` table for ready messages (status = 'pending', scheduled_at <= now())
+2. Dispatch `ProcessScheduledMessage` job for each
+3. Job handles status updates and error handling
+
+**Implementation:**
+```php
+namespace App\Console\Commands;
+
+use App\Jobs\ProcessScheduledMessage;
+use App\Models\ScheduledMessage;
+use Illuminate\Console\Command;
+
+class ProcessScheduledMessages extends Command
+{
+    protected $signature = 'messages:process-scheduled';
+    protected $description = 'Process scheduled messages that are ready to be sent';
+
+    public function handle(): int
+    {
+        $readyMessages = ScheduledMessage::ready()->get();
+
+        if ($readyMessages->isEmpty()) {
+            $this->info('No scheduled messages ready for processing.');
+            return Command::SUCCESS;
+        }
+
+        $this->info("Found {$readyMessages->count()} scheduled messages ready for processing...");
+
+        foreach ($readyMessages as $message) {
+            ProcessScheduledMessage::dispatch($message->id);
+            
+            $this->line("→ Dispatched message #{$message->id} ({$message->total_recipients} recipients)");
+        }
+
+        $this->info("✓ Dispatched {$readyMessages->count()} scheduled messages");
+
+        return Command::SUCCESS;
+    }
+}
+```
+
+**Register in `app/Console/Kernel.php`:**
+```php
+namespace App\Console;
+
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
+class Kernel extends ConsoleKernel
+{
+    protected function schedule(Schedule $schedule): void
+    {
+        $schedule->command('messages:process-scheduled')
+            ->everyMinute()
+            ->withoutOverlapping()
+            ->runInBackground();
+    }
+
+    protected function commands(): void
+    {
+        $this->load(__DIR__.'/Commands');
+
+        require base_path('routes/console.php');
+    }
+}
+```
+
+**Manual Execution:**
+```bash
+# Process scheduled messages immediately
+php artisan messages:process-scheduled
+
+# Run scheduler (includes this command)
+php artisan schedule:work
+```
+
+---
 
 ### SendScheduledBroadcasts
 
 **Location:** `app/Console/Commands/SendScheduledBroadcasts.php`
 
+**Signature:** `broadcasts:send`
+
 **Schedule:** Runs every minute
 
-**Description:** Processes scheduled broadcasts.
+**Description:** Processes scheduled campaign broadcasts (alternative to ScheduledMessage for multi-group campaigns).
 
 **Logic:**
 1. Query campaigns with `scheduled_at <= now()` and `status = 'pending'`
-2. Dispatch `BroadcastToGroupJob` for each
+2. Dispatch `BroadcastToGroupJob` for each group in campaign
 3. Update campaign status to `sending`
 
 **Implementation:**
@@ -969,41 +1535,80 @@ namespace App\Console\Commands;
 use App\Jobs\BroadcastToGroupJob;
 use App\Models\Campaign;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class SendScheduledBroadcasts extends Command
 {
     protected $signature = 'broadcasts:send';
-    protected $description = 'Send scheduled broadcasts';
+    protected $description = 'Send scheduled campaign broadcasts';
 
-    public function handle()
+    public function handle(): int
     {
         $campaigns = Campaign::where('status', 'pending')
             ->where('scheduled_at', '<=', now())
+            ->with('groups')
             ->get();
 
-        foreach ($campaigns as $campaign) {
-            foreach ($campaign->groups as $group) {
-                BroadcastToGroupJob::dispatch(
-                    $group->id,
-                    $campaign->message,
-                    $campaign->sender_id
-                );
-            }
-            
-            $campaign->update(['status' => 'sending']);
+        if ($campaigns->isEmpty()) {
+            $this->info('No scheduled broadcasts ready.');
+            return Command::SUCCESS;
         }
 
-        $this->info("Dispatched {$campaigns->count()} scheduled broadcasts");
+        $this->info("Found {$campaigns->count()} scheduled campaigns...");
+
+        DB::transaction(function () use ($campaigns) {
+            foreach ($campaigns as $campaign) {
+                $groupCount = $campaign->groups->count();
+                
+                foreach ($campaign->groups as $group) {
+                    BroadcastToGroupJob::dispatch(
+                        $group->id,
+                        $campaign->message,
+                        $campaign->sender_id ?? config('sms.default_sender_id')
+                    );
+                }
+                
+                $campaign->update([
+                    'status' => 'sending',
+                    'sent_at' => now(),
+                ]);
+
+                $this->line("→ Dispatched campaign #{$campaign->id} to {$groupCount} group(s)");
+            }
+        });
+
+        $this->info("✓ Dispatched {$campaigns->count()} scheduled campaigns");
+
+        return Command::SUCCESS;
     }
 }
 ```
 
 **Register in `app/Console/Kernel.php`:**
 ```php
-protected function schedule(Schedule $schedule)
+protected function schedule(Schedule $schedule): void
 {
-    $schedule->command('broadcasts:send')->everyMinute();
+    // Process scheduled messages
+    $schedule->command('messages:process-scheduled')
+        ->everyMinute()
+        ->withoutOverlapping()
+        ->runInBackground();
+
+    // Process scheduled campaigns
+    $schedule->command('broadcasts:send')
+        ->everyMinute()
+        ->withoutOverlapping()
+        ->runInBackground();
 }
+```
+
+**Manual Execution:**
+```bash
+# Send scheduled broadcasts immediately
+php artisan broadcasts:send
+
+# See all scheduled commands
+php artisan schedule:list
 ```
 
 ---

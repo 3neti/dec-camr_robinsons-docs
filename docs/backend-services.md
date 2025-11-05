@@ -39,10 +39,11 @@ This document outlines the Laravel Actions, Controllers, and Services that power
 namespace App\Actions;
 
 use App\Jobs\SendSMSJob;
+use App\Models\Contact;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Lorisleiva\Actions\Concerns\AsAction;
+use Propaganistas\LaravelPhone\PhoneNumber;
 
 class SendToMultipleRecipients
 {
@@ -57,22 +58,33 @@ class SendToMultipleRecipients
             ? explode(',', $recipients) 
             : $recipients;
         
-        // Trim and filter
-        $recipientArray = array_filter(
-            array_map('trim', $recipientArray)
-        );
-        
+        $normalizedRecipients = [];
         $dispatchedCount = 0;
         
         foreach ($recipientArray as $mobile) {
-            SendSMSJob::dispatch($mobile, $message, $senderId);
-            $dispatchedCount++;
+            try {
+                // Create PhoneNumber object and Contact
+                $phone = new PhoneNumber(trim($mobile), 'PH');
+                $contact = Contact::fromPhoneNumber($phone);
+                
+                // Get E.164 format for SMS sending
+                $e164Mobile = $contact->e164_mobile;
+                
+                SendSMSJob::dispatch($e164Mobile, $message, $senderId);
+                
+                $normalizedRecipients[] = $e164Mobile;
+                $dispatchedCount++;
+            } catch (\Exception $e) {
+                // Skip invalid numbers
+                continue;
+            }
         }
         
         return [
             'status' => 'queued',
             'count' => $dispatchedCount,
-            'recipients' => $recipientArray,
+            'recipients' => $normalizedRecipients,
+            'invalid_count' => count($recipientArray) - count($normalizedRecipients),
         ];
     }
 
@@ -441,7 +453,9 @@ class DeleteGroup
 **Request:**
 ```json
 {
-  "mobile": "+639171234567"
+  "mobile": "0917 123 4567",
+  "name": "Juan Dela Cruz",
+  "tags": ["barangay-leader", "volunteer"]
 }
 ```
 
@@ -453,20 +467,37 @@ use App\Models\Contact;
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use LBHurtado\Contact\Data\ContactData;
 use Lorisleiva\Actions\Concerns\AsAction;
+use Propaganistas\LaravelPhone\PhoneNumber;
 
 class AddContactToGroup
 {
     use AsAction;
 
-    public function handle(int $groupId, string $mobile): Contact
-    {
+    public function handle(
+        int $groupId, 
+        string $mobile, 
+        ?string $name = null,
+        array $tags = []
+    ): Contact {
         $group = Group::findOrFail($groupId);
         
-        // Find or create contact
-        $contact = Contact::firstOrCreate(
-            ['mobile' => $mobile]
-        );
+        // Create PhoneNumber and Contact using package method
+        $phone = new PhoneNumber($mobile, 'PH');
+        $contact = Contact::fromPhoneNumber($phone);
+        
+        // Set name if provided
+        if ($name) {
+            $contact->setMeta('name', $name);
+        }
+        
+        // Set tags if provided
+        if (!empty($tags)) {
+            $contact->setTags($tags);
+        }
+        
+        $contact->save();
         
         // Attach to group if not already attached
         if (!$group->contacts->contains($contact)) {
@@ -479,12 +510,23 @@ class AddContactToGroup
     public function asController(Request $request, int $id): JsonResponse
     {
         $validated = $request->validate([
-            'mobile' => 'required|string|regex:/^\+63[0-9]{10}$/',
+            'mobile' => 'required|phone:PH',
+            'name' => 'nullable|string|max:255',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
         ]);
 
-        $contact = $this->handle($id, $validated['mobile']);
+        $contact = $this->handle(
+            $id,
+            $validated['mobile'],
+            $validated['name'] ?? null,
+            $validated['tags'] ?? []
+        );
 
-        return response()->json($contact, 201);
+        return response()->json(
+            ContactData::fromModel($contact),
+            201
+        );
     }
 }
 ```
@@ -500,7 +542,9 @@ class AddContactToGroup
 **Request:**
 ```json
 {
-  "mobile": "+639189876543"
+  "mobile": "0918 765 4321",
+  "name": "Juan Dela Cruz",
+  "tags": ["barangay-leader", "health-worker"]
 }
 ```
 
@@ -512,14 +556,21 @@ use App\Models\Contact;
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use LBHurtado\Contact\Data\ContactData;
 use Lorisleiva\Actions\Concerns\AsAction;
+use Propaganistas\LaravelPhone\PhoneNumber;
 
 class UpdateContactInGroup
 {
     use AsAction;
 
-    public function handle(int $groupId, int $contactId, array $data): Contact
-    {
+    public function handle(
+        int $groupId, 
+        int $contactId, 
+        ?string $mobile = null,
+        ?string $name = null,
+        ?array $tags = null
+    ): Contact {
         $group = Group::findOrFail($groupId);
         $contact = Contact::findOrFail($contactId);
         
@@ -528,7 +579,24 @@ class UpdateContactInGroup
             abort(404, 'Contact not found in this group');
         }
         
-        $contact->update($data);
+        // Update mobile if provided
+        if ($mobile) {
+            $phone = new PhoneNumber($mobile, 'PH');
+            $contact->mobile = $phone->formatForMobileDialingInCountry('PH');
+            $contact->country = 'PH';
+        }
+        
+        // Update name if provided
+        if ($name !== null) {
+            $contact->setMeta('name', $name);
+        }
+        
+        // Update tags if provided
+        if ($tags !== null) {
+            $contact->setTags($tags);
+        }
+        
+        $contact->save();
 
         return $contact->fresh();
     }
@@ -536,12 +604,24 @@ class UpdateContactInGroup
     public function asController(Request $request, int $groupId, int $contactId): JsonResponse
     {
         $validated = $request->validate([
-            'mobile' => 'required|string|regex:/^\+63[0-9]{10}$/',
+            'mobile' => 'sometimes|phone:PH',
+            'name' => 'nullable|string|max:255',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
         ]);
 
-        $contact = $this->handle($groupId, $contactId, $validated);
+        $contact = $this->handle(
+            $groupId,
+            $contactId,
+            $validated['mobile'] ?? null,
+            $validated['name'] ?? null,
+            $validated['tags'] ?? null
+        );
 
-        return response()->json($contact, 200);
+        return response()->json(
+            ContactData::fromModel($contact),
+            200
+        );
     }
 }
 ```
@@ -606,8 +686,10 @@ class DeleteContactFromGroup
 ```php
 namespace App\Actions\Contacts;
 
+use App\Http\Resources\ContactResource;
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class ListGroupContacts
@@ -623,14 +705,73 @@ class ListGroupContacts
             ->get();
     }
 
-    public function asController(int $id): JsonResponse
+    public function asController(int $id): AnonymousResourceCollection
     {
         $contacts = $this->handle($id);
 
-        return response()->json($contacts, 200);
+        return ContactResource::collection($contacts);
     }
 }
 ```
+
+---
+
+### ContactResource
+
+**Location:** `app/Http/Resources/ContactResource.php`
+
+**Description:** API resource for Contact model using lbhurtado/contact package features.
+
+**Implementation:**
+```php
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ContactResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'mobile' => $this->mobile,
+            'mobile_e164' => $this->e164_mobile,
+            'country' => $this->country,
+            'name' => $this->name,
+            'bank_account' => $this->bank_account,
+            'bank_code' => $this->bank_code,
+            'account_number' => $this->account_number,
+            'tags' => $this->getTags(),
+            'extra_attributes' => $this->extra_attributes->all(),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
+    }
+}
+```
+
+**Example Response:**
+```json
+{
+  "id": 1,
+  "mobile": "09171234567",
+  "mobile_e164": "+639171234567",
+  "country": "PH",
+  "name": "Juan Dela Cruz",
+  "bank_account": "GXCHPHM2XXX:09171234567",
+  "bank_code": "GXCHPHM2XXX",
+  "account_number": "09171234567",
+  "tags": ["barangay-leader", "volunteer"],
+  "extra_attributes": {
+    "address": "Quezon City",
+    "notes": "Active volunteer"
+  },
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z"
+}
+```
+
+> **Note:** The Contact model extends `LBHurtado\Contact\Models\Contact`. See [Contact Package](contact-package.md) for complete documentation on package features including phone normalization, schemaless attributes, and bank account management.
 
 ---
 

@@ -1,6 +1,6 @@
 # Gateway Device API
 
-## 📡 Overview
+## Overview
 
 The Gateway Device API provides endpoints for remote terminal units (RTUs/gateways) to communicate with the CAMR central system. Gateways poll these endpoints periodically to:
 
@@ -13,7 +13,7 @@ The Gateway Device API provides endpoints for remote terminal units (RTUs/gatewa
 
 **Controller:** `app/Http/Controllers/CAMRGatewayDeviceController.php`
 
-## 🔐 Authentication
+## Authentication
 
 **Gateway Identification:** Gateways are identified by their **MAC address** in the URL path.
 
@@ -21,7 +21,7 @@ The Gateway Device API provides endpoints for remote terminal units (RTUs/gatewa
 
 **Security:** Gateway MAC addresses act as the authentication mechanism. Only registered gateways in the database will receive valid responses.
 
-## 🕒 Time Synchronization
+## Time Synchronization
 
 ### Check Server Time
 
@@ -45,7 +45,7 @@ Host: camr.yourdomain.com
 - Gateways use this to synchronize their internal clocks
 - Ensures meter reading timestamps are accurate
 
-## 📝 CSV Configuration Updates
+## CSV Configuration Updates
 
 Gateways can download updated meter lists and configurations.
 
@@ -147,7 +147,7 @@ Host: camr.yourdomain.com
 - Sets `meter_rtu.update_rtu = 0` for the gateway
 - Gateway has acknowledged the CSV download
 
-## 📍 Site Code Configuration
+## Site Code Configuration
 
 Gateways can download updated site/location codes.
 
@@ -212,7 +212,7 @@ Host: camr.yourdomain.com
 **Effect:**
 - Sets `meter_rtu.update_rtu_location = 0`
 
-## 🔒 Remote SSH Access Control
+## Remote SSH Access Control
 
 ### Check SSH Status
 
@@ -241,7 +241,7 @@ Host: camr.yourdomain.com
 - Gateway reads this flag and enables/disables SSH daemon
 - No automatic reset (persists until manually changed)
 
-## 📈 Force Load Profile Collection
+## Force Load Profile Collection
 
 ### Check Force Load Profile Status
 
@@ -282,7 +282,7 @@ Host: camr.yourdomain.com
 - Sets `meter_rtu.update_rtu_force_lp = 0`
 - Gateway has completed forced load profile collection
 
-## 📊 Meter Data Submission
+## Meter Data Submission
 
 ### Submit Meter Reading
 
@@ -357,7 +357,7 @@ OK, 2024-11-05 14:30:15
 - Data saved to `meter_data` or `live_meter_data` based on `save_to_meter_data` flag
 - Returns server time for gateway synchronization
 
-## 🔄 Gateway Polling Workflow
+## Gateway Polling Workflow
 
 Typical gateway polling sequence:
 
@@ -422,7 +422,7 @@ sequenceDiagram
     Note over G: Sleep until next cycle
 ```
 
-## 🔧 Administrative Control
+## Administrative Control
 
 Administrators trigger gateway actions via web interface:
 
@@ -451,7 +451,7 @@ Administrators trigger gateway actions via web interface:
 3. Gateway collects and uploads load profiles
 4. Gateway resets flag
 
-## ⚠️ Important Notes
+## Important Notes
 
 1. **No Authentication:** Endpoints rely on MAC address identification only
 2. **Polling Frequency:** Gateways poll at their configured intervals (typically 5-15 minutes)
@@ -461,7 +461,7 @@ Administrators trigger gateway actions via web interface:
 6. **Two Data Tables:** `save_to_meter_data` flag determines storage location
 7. **MAC Address Format:** Use colon-separated format (AA:BB:CC:DD:EE:FF)
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Gateway Not Downloading CSV
 - Check `meter_rtu.update_rtu` flag is set to 1
@@ -480,7 +480,7 @@ Administrators trigger gateway actions via web interface:
 - Ensure `update_rtu_location` flag was set
 - Confirm gateway downloaded and applied update
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [Gateway Management](../modules/gateway-management.md) - Admin interface
 - [Load Profile API](load-profile-api.md) - Load profile upload

@@ -1,10 +1,10 @@
 # Database Schema
 
-## 📊 Overview
+## Overview
 
 The CAMR system uses a MySQL database named `meter_reading_robinsons` with 16 tables organized around core entities: Sites, Gateways (RTUs), Meters, Buildings, Users, and time-series meter data.
 
-## 🗂️ Entity Relationship Diagram
+## Entity Relationship Diagram
 
 ```mermaid
 erDiagram
@@ -24,7 +24,7 @@ erDiagram
     SITE ||--o{ USER_SITE_ACCESS : "grants access"
 ```
 
-## 📋 Tables
+## Tables
 
 ### Core Infrastructure Tables
 
@@ -342,7 +342,7 @@ Audit trail (Spatie Laravel ActivityLog package).
 | `properties` | JSON | Additional properties |
 | `created_at` | TIMESTAMP | Log timestamp |
 
-## 🔗 Relationships
+## Relationships
 
 ### Hierarchy
 ```
@@ -383,7 +383,7 @@ Company → Division → Site → Building → Meter Location
    - `meter_data.meter_id` (string) matches `meter_details.meter_name`
    - `load_profile.meter_id` (string) matches `meter_details.meter_name`
 
-## 📊 Indexing Strategy
+## Indexing Strategy
 
 ### Performance Indexes
 
@@ -402,21 +402,21 @@ Company → Division → Site → Building → Meter Location
 - **Load Profile**: Query `load_profile` with datetime filtering
 - **Access Control**: Query `user_access_group` joined with `user_tb`
 
-## 🔄 Data Flow
+## Data Flow
 
 1. **Gateway → meter_data**: Gateways push meter readings
 2. **Gateway → load_profile**: Gateways upload load profile files
 3. **User Actions → activity_log**: All user actions logged for audit
 4. **Configuration Changes → meter_rtu flags**: Update flags trigger gateway actions
 
-## 💾 Storage Considerations
+## Storage Considerations
 
 - **meter_data**: Grows continuously (hourly readings)
 - **load_profile**: Grows continuously (15-min intervals)
 - **activity_log**: Grows with user activity
 - **Recommendation**: Implement data archival/partitioning strategy
 
-## 🔍 Common Queries
+## Common Queries
 
 ### Get all meters for a site
 ```sql

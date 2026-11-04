@@ -1,6 +1,6 @@
 # Meter Management
 
-## ⚡ Overview
+## Overview
 
 Meter Management handles electrical meters that measure power consumption. Meters are connected to gateways and assigned to specific locations (EE rooms). The system tracks meter readings, online/offline status, and configuration details.
 
@@ -8,7 +8,7 @@ Meter Management handles electrical meters that measure power consumption. Meter
 **Model:** `MeterModel` (table: `meter_details`)  
 **Access:** Site Dashboard → Meter Tab
 
-## 📊 Key Features
+## Key Features
 
 ### 1. Meter Listing
 
@@ -45,9 +45,9 @@ if($last_log_update == "0000/00/00 00:00") {
 ```
 
 **Status Indicators:**
-- 🟢 **Online** - Cloud check icon, data received < 24 hours ago
-- 🔴 **Offline** - Cloud slash icon, no data for 1+ days
-- ⚫ **No Data** - Never successfully polled
+- **Online** - Cloud check icon, data received < 24 hours ago
+- **Offline** - Cloud slash icon, no data for 1+ days
+- **No Data** - Never successfully polled
 
 ### 3. Meter Types
 
@@ -174,7 +174,7 @@ AND (
 );
 ```
 
-## 🔄 Workflows
+## Workflows
 
 ### Meter Registration Workflow
 
@@ -248,7 +248,7 @@ sequenceDiagram
     Note over DB: Historical data in<br/>meter_data preserved
 ```
 
-## 📑 Database Schema
+## Database Schema
 
 ### Meter Record Structure
 
@@ -330,7 +330,7 @@ WHERE md.rtu_idx = ?
 ORDER BY md.meter_name;
 ```
 
-## 🔧 Configuration Files
+## Configuration Files
 
 **Purpose:** Define meter communication protocol and settings
 
@@ -347,7 +347,7 @@ ORDER BY md.meter_name;
 - Each meter must have assigned configuration file
 - Config files stored on gateway device
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Meter Shows Offline
 
@@ -440,7 +440,7 @@ WHERE meter_id = ?;
 - PT ratio: e.g., 11000:110 = 100x multiplier
 - Combined: CT × PT = total multiplier
 
-## ⚡ Performance Considerations
+## Performance Considerations
 
 ### Meter Limits Per Gateway
 
@@ -466,7 +466,7 @@ CREATE INDEX idx_last_log ON meter_details(last_log_update);
 CREATE UNIQUE INDEX idx_meter_site ON meter_details(meter_name, site_idx);
 ```
 
-## 💡 Best Practices
+## Best Practices
 
 ### Naming Conventions
 
@@ -506,7 +506,7 @@ CREATE UNIQUE INDEX idx_meter_site ON meter_details(meter_name, site_idx);
 - Excluded from reports
 - Use for decommissioned or spare meters
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [Database Schema](../database-schema.md) - meter_details table
 - [Models](../models.md) - MeterModel

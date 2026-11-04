@@ -1,10 +1,10 @@
-# 🔒 Site Access Control
+# Site Access Control
 
 The CAMR system implements **role-based access control (RBAC)** at the site level, allowing administrators to grant or revoke user access to specific sites (properties/buildings). This ensures users only see data for sites they're authorized to manage.
 
 ---
 
-## 📋 Overview
+## Overview
 
 **Controller:** `UserSiteAccessController.php`  
 **Model:** `UserSiteAccessModel.php`  
@@ -15,7 +15,7 @@ The CAMR system implements **role-based access control (RBAC)** at the site leve
 
 ---
 
-## 🔑 Key Concepts
+## Key Concepts
 
 ### Access Control Hierarchy
 
@@ -39,7 +39,7 @@ User
 
 ---
 
-## ⚙️ Access Control Implementation
+## Access Control Implementation
 
 ### Routes
 
@@ -112,7 +112,7 @@ public function getUserSiteAccess(Request $request)
 
 ---
 
-## 🔄 Grant/Revoke Access
+## Grant/Revoke Access
 
 ### Update User Site Access
 
@@ -168,7 +168,7 @@ public function add_user_access_post(Request $request){
 
 ---
 
-## 📊 Access Control Flow
+## Access Control Flow
 
 ```mermaid
 flowchart TB
@@ -205,7 +205,7 @@ flowchart TB
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### user_access_group Table
 
@@ -235,7 +235,7 @@ UNIQUE (user_idx, site_idx);
 
 ---
 
-## 🔍 Checking Access in Controllers
+## Checking Access in Controllers
 
 ### Admin vs User Site Lists
 
@@ -284,7 +284,7 @@ SELECT * FROM meter_site;
 
 ---
 
-## 🛡️ Security Best Practices
+## Security Best Practices
 
 ### Always Validate Access
 
@@ -331,7 +331,7 @@ public function add_user_access_post(Request $request)
 
 ---
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Example 1: Grant Site Access to New User
 
@@ -342,9 +342,9 @@ public function add_user_access_post(Request $request)
 3. Click **Edit** on user "jane.smith"
 4. Click **Site Access** tab
 5. Check boxes for:
-   - ✅ Robinson's Galleria
-   - ✅ Robinson's Place Manila
-   - ✅ Robinson's Magnolia
+   - Robinson's Galleria
+   - Robinson's Place Manila
+   - Robinson's Magnolia
 6. Click **Save Changes**
 7. System deletes all existing grants
 8. System inserts 3 new records in `user_access_group`
@@ -356,11 +356,11 @@ public function add_user_access_post(Request $request)
 
 1. Admin opens user's Site Access page
 2. **Uncheck** old sites:
-   - ❌ Robinson's Galleria
-   - ❌ Robinson's Place Manila
+   - Robinson's Galleria
+   - Robinson's Place Manila
 3. **Check** new sites:
-   - ✅ Robinson's Ermita
-   - ✅ Robinson's Otis
+   - Robinson's Ermita
+   - Robinson's Otis
 4. Save changes
 5. User loses access to old sites immediately
 6. User gains access to new sites
@@ -376,7 +376,7 @@ public function add_user_access_post(Request $request)
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Issue: User Cannot See Any Sites
 
@@ -436,7 +436,7 @@ ADD CONSTRAINT unique_user_site UNIQUE (user_idx, site_idx);
 
 ---
 
-## 📊 Access Audit & Reporting
+## Access Audit & Reporting
 
 ### Query: List All User Permissions
 
@@ -490,7 +490,7 @@ ORDER BY b.building_code;
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - **[Authentication](authentication.md)** - Login and session management
 - **[User Management](user-management.md)** - User CRUD operations
@@ -500,7 +500,7 @@ ORDER BY b.building_code;
 
 ---
 
-## 📝 Best Practices
+## Best Practices
 
 ### For Administrators
 

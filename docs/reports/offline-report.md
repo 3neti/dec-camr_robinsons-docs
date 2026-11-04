@@ -1,10 +1,10 @@
-# 📴 Offline Report
+# Offline Report
 
 The **Offline Report** provides real-time visibility into gateway and meter devices that have stopped transmitting data to the CAMR system. This critical operational report helps identify communication issues, device failures, or network problems that require immediate attention.
 
 ---
 
-## 📋 Overview
+## Overview
 
 **Controller:** `OfflineReportController.php`  
 **Routes:**
@@ -19,7 +19,7 @@ The **Offline Report** provides real-time visibility into gateway and meter devi
 
 ---
 
-## 🔑 Key Features
+## Key Features
 
 ### Input Parameters
 
@@ -45,7 +45,7 @@ A device is considered **offline** if:
 
 ---
 
-## ⚙️ Query Logic
+## Query Logic
 
 ### Offline Gateway Detection
 
@@ -120,7 +120,7 @@ $offline_meter_data = DB::select("$raw_query_offline", [$siteID, $siteID]);
 
 ---
 
-## 📊 Report Data Flow
+## Report Data Flow
 
 ```mermaid
 flowchart TB
@@ -156,7 +156,7 @@ flowchart TB
 
 ---
 
-## 📄 Excel Report Structure
+## Excel Report Structure
 
 ### Offline Gateway Report Columns
 
@@ -196,7 +196,7 @@ flowchart TB
 
 ---
 
-## 🔄 Implementation Details
+## Implementation Details
 
 ### Download Offline Gateway Report
 
@@ -260,7 +260,7 @@ Similar implementation pattern:
 
 ---
 
-## 📈 Site Dashboard Integration
+## Site Dashboard Integration
 
 Offline counts are displayed on the **Site Details** dashboard:
 
@@ -288,15 +288,15 @@ $offline_data = DB::select("$raw_query_offline", [$siteID, ..., $siteID]);
 
 **Dashboard Display:**
 - **Total Gateways:** 24
-- **Offline Gateways:** 2 🔴 (with download button)
+- **Offline Gateways:** 2 (with download button)
 - **Total Meters:** 156
-- **Offline Meters:** 8 🔴 (with download button)
+- **Offline Meters:** 8 (with download button)
 
 Clicking the download button triggers the respective report generation.
 
 ---
 
-## ⚡ Performance Considerations
+## Performance Considerations
 
 ### Execution Limits
 ```php
@@ -321,7 +321,7 @@ These settings prevent timeout for sites with hundreds of offline devices.
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Issue: Report Shows All Devices Offline
 
@@ -386,7 +386,7 @@ exit();
 
 ---
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Example 1: Daily Operational Check
 
@@ -395,7 +395,7 @@ exit();
 1. Navigate to **Site Details** for Robinson's Galleria
 2. Check dashboard metrics:
    - Total Gateways: 32
-   - Offline Gateways: 3 🔴
+   - Offline Gateways: 3
 3. Click **Download Offline Gateway Report**
 4. Open Excel file: `Offline_Gateway_RG_2024_03_15_08_30_45.xlsx`
 5. Review offline devices:
@@ -432,7 +432,7 @@ exit();
 
 ---
 
-## 🔐 Security & Access Control
+## Security & Access Control
 
 ### Route Middleware
 ```php path=/Users/rli/Documents/DEC/camr_robinsons-main/camr_robinsons-main/routes/web.php start=187
@@ -463,7 +463,7 @@ activity('offline_report')
 
 ---
 
-## 📝 Best Practices
+## Best Practices
 
 ### For Operations Teams
 
@@ -516,7 +516,7 @@ activity('offline_report')
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - **[Site Management](../modules/site-management.md)** - Site dashboard and metrics
 - **[Gateway Management](../modules/gateway-management.md)** - Gateway device lifecycle
@@ -527,7 +527,7 @@ activity('offline_report')
 
 ---
 
-## 📚 Additional Notes
+## Additional Notes
 
 ### Why 24-Hour Threshold?
 

@@ -1,6 +1,6 @@
 # System Overview
 
-## 📋 Project Summary
+## Project Summary
 
 **Project Name:** CAMR Robinsons - Centralized Automated Meter Reading  
 **Purpose:** Monitor and report on electricity consumption across multiple Robinsons properties  
@@ -8,7 +8,7 @@
 **Database:** MySQL (`meter_reading_robinsons`)  
 **Status:** Production
 
-## 🎯 Business Objectives
+## Business Objectives
 
 The CAMR system was developed to:
 
@@ -18,7 +18,7 @@ The CAMR system was developed to:
 4. **Support Multi-Site Management** - Allow administrators to manage multiple properties from one interface
 5. **Provide Consumption Analytics** - Analyze energy usage patterns at site, building, and meter levels
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### High-Level Components
 
@@ -75,7 +75,7 @@ flowchart TB
    - Web preview with DataTables
    - Direct Excel export functionality
 
-## 🔑 Key Features Breakdown
+## Key Features Breakdown
 
 ### Site Management
 - Create and configure sites with metadata (location, company, division)
@@ -108,7 +108,7 @@ flowchart TB
 - **Offline Report:** Gateway and meter availability
 - **Site As-Built:** Infrastructure documentation
 
-## 👥 User Roles
+## User Roles
 
 ### Administrator
 - Full system access
@@ -123,7 +123,7 @@ flowchart TB
 - Generate reports for authorized sites
 - Cannot manage users or system configuration
 
-## 🔐 Security Features
+## Security Features
 
 - Session-based authentication
 - Password reset via email
@@ -132,7 +132,7 @@ flowchart TB
 - Activity logging (via Spatie Laravel ActivityLog)
 - Middleware protection on all routes (`isLoggedIn`, `alreadyLoggedIn`)
 
-## 📊 Data Model Overview
+## Data Model Overview
 
 ### Core Entities
 - **Sites** - Physical locations (malls, properties)
@@ -153,7 +153,7 @@ flowchart TB
 - Users have access to specific Sites (many-to-many)
 - Meter Data links to Meters and Gateways
 
-## 🚀 Technology Highlights
+## Technology Highlights
 
 - **Laravel 8** - Modern PHP framework with Eloquent ORM
 - **DataTables** - Server-side pagination and filtering for large datasets
@@ -162,7 +162,7 @@ flowchart TB
 - **Laravel Mix** - Asset compilation (Webpack wrapper)
 - **Activity Logging** - Audit trail for user actions
 
-## 📈 Scalability Considerations
+## Scalability Considerations
 
 - Designed for multiple sites (current: Robinsons properties)
 - Supports many-to-many gateway-meter relationships
@@ -170,7 +170,7 @@ flowchart TB
 - DataTables pagination for large result sets
 - Excel export with memory-efficient streaming
 
-## 🔄 Integration Points
+## Integration Points
 
 ### Inbound
 - Gateway device polling (RTU check update endpoints)
@@ -180,7 +180,7 @@ flowchart TB
 - SAP report generation (Excel format)
 - Email notifications (password reset)
 
-## 📅 Maintenance Schedule
+## Maintenance Schedule
 
 ### Regular Tasks
 - Database backup and retention (time-series data grows continuously)
@@ -193,7 +193,7 @@ flowchart TB
 - Refresh site codes for gateways
 - Generate monthly/quarterly reports
 
-## 🎓 Learning Path for New Developers
+## Learning Path for New Developers
 
 1. **Review this documentation** - Understand system purpose and architecture
 2. **Explore the database** - Review migrations and models

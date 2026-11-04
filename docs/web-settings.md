@@ -4,7 +4,7 @@ The **Web Page Settings** module provides comprehensive control over the applica
 
 ---
 
-## 📋 Overview
+## Overview
 
 **Controller:** `CAMRWebpageController.php`  
 **Model:** `WebPageSettingsModel.php`  
@@ -29,7 +29,7 @@ The Web Page Settings module allows authorized users (typically administrators) 
 
 ---
 
-## 🔑 Key Features
+## Key Features
 
 ### 1. Navigation Header Title Customization
 
@@ -130,7 +130,7 @@ Previews update in real-time as settings are adjusted.
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### `web_page_settings` Table
 
@@ -160,7 +160,7 @@ DB::statement("ALTER TABLE web_page_settings ADD image_logo LONGBLOB after navig
 
 ---
 
-## 🔄 Model Configuration
+## Model Configuration
 
 ### WebPageSettingsModel
 
@@ -209,7 +209,7 @@ class WebPageSettingsModel extends Model
 
 ---
 
-## 🛠️ Implementation Details
+## Implementation Details
 
 ### Retrieving Web Settings
 
@@ -287,7 +287,7 @@ if($default_web_settings=='on'){
 
 ---
 
-## 🔀 Workflow Diagram
+## Workflow Diagram
 
 ```mermaid
 flowchart TB
@@ -335,7 +335,7 @@ flowchart TB
 
 ---
 
-## 🎯 Usage Examples
+## Usage Examples
 
 ### Example 1: Resetting to Default DEC Branding
 
@@ -384,7 +384,7 @@ flowchart TB
 
 ---
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Issue 1: Logo Not Appearing After Upload
 
@@ -512,7 +512,7 @@ $request->validate([
 
 ---
 
-## ✅ Best Practices
+## Best Practices
 
 ### 1. Logo File Optimization
 
@@ -586,7 +586,7 @@ $activities = Activity::where('log_name', 'Web Page Details')
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Configuration Files](configuration/config-files.md) - System-wide configuration management
 - [Company & Division](configuration/company-division.md) - Organizational structure setup
@@ -596,7 +596,7 @@ $activities = Activity::where('log_name', 'Web Page Details')
 
 ---
 
-## 📝 Summary
+## Summary
 
 The **Web Page Settings** module provides a user-friendly interface for customizing the CAMR application's visual identity. By centralizing branding control in a single table with base64-encoded logo storage, the system enables organizations to maintain brand consistency across all pages without requiring file system access or complex configuration.
 

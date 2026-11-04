@@ -1,6 +1,6 @@
 # Consumption Report
 
-## 📊 Overview
+## Overview
 
 The Consumption Report analyzes meter energy consumption over flexible time periods with hourly or daily aggregation. It calculates consumption between readings and applies meter multipliers for accurate kWh totals.
 
@@ -8,7 +8,7 @@ The Consumption Report analyzes meter energy consumption over flexible time peri
 **Route:** `/consumption_report`  
 **Data Source:** `meter_data` table
 
-## 🔑 Key Features
+## Key Features
 
 ### Report Types
 
@@ -33,7 +33,7 @@ The Consumption Report analyzes meter energy consumption over flexible time peri
 - **Aggregation:** Hourly or Daily
 - **Format:** DataTables or Excel export
 
-## 📊 Calculation Logic
+## Calculation Logic
 
 ### Consumption Formula
 
@@ -111,7 +111,7 @@ foreach ($period as $key => $date) {
 - End: 2024-01-15 23:55
 - Captures: Nearly 24-hour period
 
-## 📊 Query Logic
+## Query Logic
 
 ### Min/Max Reading Query
 
@@ -147,7 +147,7 @@ FROM meter_details
 WHERE meter_name = ? AND site_idx = ?
 ```
 
-## 📝 Report Output
+## Report Output
 
 ### Displayed Columns
 
@@ -182,7 +182,7 @@ if($KWh > 0) {
 
 Periods with zero or negative consumption are excluded from results.
 
-## 🔄 Usage Workflow
+## Usage Workflow
 
 ```mermaid
 sequenceDiagram
@@ -212,7 +212,7 @@ sequenceDiagram
     C-->>UI: Display in DataTables
 ```
 
-## ⚡ Performance
+## Performance
 
 ### Index Usage
 
@@ -250,7 +250,7 @@ ON meter_data(meter_id, location, datetime);
 - LIMIT 0,1 for single result
 - Self-join for min/max in one query
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### No Data Returned
 
@@ -309,7 +309,7 @@ ORDER BY date;
 3. Limit date range
 4. Check table size
 
-## 📊 Usage Examples
+## Usage Examples
 
 ### Weekly Hourly Analysis
 
@@ -353,7 +353,7 @@ GROUP BY month
 ORDER BY month;
 ```
 
-## 💡 Best Practices
+## Best Practices
 
 ### Aggregation Selection
 
@@ -393,7 +393,7 @@ ORDER BY month;
 - Load breakdown
 - Energy distribution
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [SAP Report](sap-report.md) - Billing with month comparison
 - [RAW Report](raw-report.md) - Detailed 15-min data

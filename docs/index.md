@@ -1,25 +1,25 @@
 # CAMR Robinsons - Centralized Automated Meter Reading System
 
-## 📊 Overview
+## Overview
 
 The **Centralized Automated Meter Reading (CAMR)** system for Robinsons is a Laravel 8-based web application designed to monitor, manage, and report on electricity consumption across multiple sites. The system collects data from remote gateways and meters, providing comprehensive reporting and analysis capabilities.
 
-## ✨ Key Features
+## Key Features
 
-### 🏢 Site & Building Management
+### Site & Building Management
 - Multi-site support with hierarchical organization
 - Building and meter location tracking
 - Company and division management
 - Customizable site access controls
 
-### 📡 Gateway & Meter Operations
+### Gateway & Meter Operations
 - Real-time gateway monitoring and configuration
 - Remote gateway management (SSH, CSV updates, site code updates)
 - Meter data collection and storage
 - Load profile receiving and processing
 - Offline detection and alerting
 
-### 📈 Comprehensive Reporting
+### Comprehensive Reporting
 - **SAP Report** - Integration with SAP systems
 - **RAW Report** - Raw meter data exports
 - **Site Report** - Site-level consumption summaries
@@ -28,19 +28,19 @@ The **Centralized Automated Meter Reading (CAMR)** system for Robinsons is a Lar
 - **Offline Report** - Gateway and meter availability reports
 - **Site As-Built** - Infrastructure documentation exports
 
-### 👥 User Management
+### User Management
 - Role-based access control
 - Site-specific access permissions
 - User account management
 - Password reset functionality via email
 
-### ⚙️ Configuration & Customization
+### Configuration & Customization
 - Web page branding (logo, navigation, header customization)
 - Configuration file management
 - Email notifications
 - Company and division hierarchies
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Framework:** Laravel 8.x
 - **PHP Version:** 7.3+ / 8.0+
@@ -53,7 +53,7 @@ The **Centralized Automated Meter Reading (CAMR)** system for Robinsons is a Lar
   - `spatie/laravel-activitylog` - Activity logging
   - `phpoffice/phpspreadsheet` - Advanced spreadsheet operations
 
-## 📋 System Components
+## System Components
 
 ### Core Modules
 1. **Site Management** - Site creation, configuration, and dashboard
@@ -74,7 +74,7 @@ The **Centralized Automated Meter Reading (CAMR)** system for Robinsons is a Lar
 - Load profile data reception
 - Remote SSH access control
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **System Requirements** - PHP 7.3+, MySQL, Composer, Node.js
 2. **Installation** - Clone repository, install dependencies, configure `.env`
@@ -82,7 +82,7 @@ The **Centralized Automated Meter Reading (CAMR)** system for Robinsons is a Lar
 4. **Web Server** - Configure Apache/Nginx to serve the application
 5. **Gateway Configuration** - Register gateways and configure meter endpoints
 
-## 📚 Documentation Structure
+## Documentation Structure
 
 This documentation is organized into the following sections:
 
@@ -96,11 +96,11 @@ This documentation is organized into the following sections:
 - **Configuration** - Environment and customization
 - **Maintenance** - Troubleshooting and known issues
 
-## 🎯 Project Context
+## Project Context
 
 This documentation was created as part of a **turnover process** to enable new development teams to understand, maintain, and enhance the CAMR Robinsons system. The system is currently in production use for monitoring electricity consumption across Robinsons properties.
 
-## 📞 Support
+## Support
 
 For technical questions or issues:
 - Review the **Troubleshooting** section

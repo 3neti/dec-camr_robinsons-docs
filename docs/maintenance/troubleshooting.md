@@ -4,7 +4,7 @@ This guide provides comprehensive troubleshooting procedures for common issues e
 
 ---
 
-## 🔍 Diagnostic Starting Points
+## Diagnostic Starting Points
 
 ### Quick Diagnostics
 
@@ -39,11 +39,11 @@ APP_DEBUG=true
 APP_ENV=local
 ```
 
-**⚠️ Warning:** Never enable `APP_DEBUG=true` in production as it exposes sensitive information.
+**Warning:** Never enable `APP_DEBUG=true` in production as it exposes sensitive information.
 
 ---
 
-## 🗄️ Database Issues
+## Database Issues
 
 ### Issue 1: Database Connection Failed
 
@@ -196,7 +196,7 @@ $gateways = Gateway::with('site')->get();
 
 ---
 
-## 🌐 Web Server Issues
+## Web Server Issues
 
 ### Issue 4: 404 Not Found on All Routes
 
@@ -317,7 +317,7 @@ php artisan view:clear
 
 ---
 
-## 🔐 Authentication Issues
+## Authentication Issues
 
 ### Issue 7: Cannot Login (Invalid Credentials)
 
@@ -408,7 +408,7 @@ php artisan migrate
 
 ---
 
-## 📡 Gateway & Device Issues
+## Gateway & Device Issues
 
 ### Issue 10: Gateway Not Connecting
 
@@ -532,7 +532,7 @@ php artisan tinker
 
 ---
 
-## 📊 Report Generation Issues
+## Report Generation Issues
 
 ### Issue 13: Report Generation Timeout
 
@@ -632,7 +632,7 @@ php artisan tinker
 
 ---
 
-## 💾 Performance Issues
+## Performance Issues
 
 ### Issue 16: Slow Page Load Times
 
@@ -721,7 +721,7 @@ gc_collect_cycles(); // Force garbage collection
 
 ---
 
-## 🔧 Maintenance Issues
+## Maintenance Issues
 
 ### Issue 18: Composer Install Fails
 
@@ -814,7 +814,7 @@ protected function schedule(Schedule $schedule)
 
 ---
 
-## 🔍 Diagnostic Commands
+## Diagnostic Commands
 
 ### Useful Artisan Commands
 
@@ -865,7 +865,7 @@ SELECT COUNT(*) FROM meter_table WHERE meter_gateway_id IS NULL;
 
 ---
 
-## 📞 Getting Help
+## Getting Help
 
 ### Log Files to Check
 
@@ -902,7 +902,7 @@ top -bn1 | head -20
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Installation Guide](../installation.md) - Initial setup and configuration
 - [Known Issues](known-issues.md) - Documented bugs and limitations
@@ -912,7 +912,7 @@ top -bn1 | head -20
 
 ---
 
-## 📝 Summary
+## Summary
 
 This troubleshooting guide covers the most common issues encountered in CAMR Robinsons deployments. For issues not covered here:
 

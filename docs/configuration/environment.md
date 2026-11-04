@@ -1,10 +1,10 @@
-# ⚙️ Environment Setup
+# Environment Setup
 
 The CAMR system uses Laravel's **environment configuration** to manage application settings, database connections, mail servers, and other environment-specific parameters. All sensitive configuration is stored in the `.env` file, which is excluded from version control.
 
 ---
 
-## 📋 Overview
+## Overview
 
 **Configuration File:** `.env` (root directory)  
 **Template:** `.env.example`  
@@ -15,7 +15,7 @@ The CAMR system uses Laravel's **environment configuration** to manage applicati
 
 ---
 
-## 🔑 Required Environment Variables
+## Required Environment Variables
 
 ### Application Settings
 
@@ -107,7 +107,7 @@ LOG_CHANNEL=stack
 
 ---
 
-## 🖥️ Server Requirements
+## Server Requirements
 
 ### PHP Requirements
 
@@ -206,7 +206,7 @@ FLUSH PRIVILEGES;
 
 ---
 
-## 🚀 Installation Steps
+## Installation Steps
 
 ### 1. Clone Repository
 
@@ -280,7 +280,7 @@ Navigate to `http://your-domain.com` and verify login page appears.
 
 ---
 
-## 🔧 Environment-Specific Configurations
+## Environment-Specific Configurations
 
 ### Local Development
 
@@ -329,34 +329,34 @@ MAIL_HOST=smtp.company.com
 
 ---
 
-## 🛡️ Security Considerations
+## Security Considerations
 
 ### Production Checklist
 
-✅ **Set APP_DEBUG=false**
+**Set APP_DEBUG=false**
 ```bash
 APP_DEBUG=false
 ```
 
-✅ **Use HTTPS**
+**Use HTTPS**
 ```bash
 APP_URL=https://camr.yourdomain.com
 ```
 
-✅ **Strong Database Credentials**
+**Strong Database Credentials**
 ```bash
 DB_USERNAME=camr_user  # Not root!
 DB_PASSWORD=Str0ng!P@ssw0rd123
 ```
 
-✅ **Restrict File Permissions**
+**Restrict File Permissions**
 ```bash
 chmod 644 .env
 chmod 755 storage
 chown -R www-data:www-data storage
 ```
 
-✅ **Enable HTTPS Redirection**
+**Enable HTTPS Redirection**
 ```php
 // In App\Providers\AppServiceProvider::boot()
 if (config('app.env') === 'production') {
@@ -364,7 +364,7 @@ if (config('app.env') === 'production') {
 }
 ```
 
-✅ **Disable Directory Listing**
+**Disable Directory Listing**
 ```apache
 # Apache
 Options -Indexes
@@ -375,7 +375,7 @@ Options -Indexes
 autoindex off;
 ```
 
-✅ **Configure Firewall**
+**Configure Firewall**
 ```bash
 # Only allow HTTP/HTTPS and SSH
 ufw allow 22/tcp
@@ -386,7 +386,7 @@ ufw enable
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Issue: "No application encryption key"
 
@@ -458,7 +458,7 @@ chmod -R 775 storage/framework/sessions
 
 ---
 
-## 📊 Performance Optimization
+## Performance Optimization
 
 ### Enable OpCache (Production)
 
@@ -499,7 +499,7 @@ REDIS_PORT=6379
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - **[Email Configuration](email.md)** - Mail server setup
 - **[Database Schema](../database-schema.md)** - Database structure

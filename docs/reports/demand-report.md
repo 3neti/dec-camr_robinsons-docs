@@ -1,6 +1,6 @@
 # Demand Report
 
-## 📊 Overview
+## Overview
 
 The Demand Report calculates electrical demand (kW) over time periods by analyzing energy consumption intervals. Demand represents the rate of energy usage and is critical for capacity planning and demand charge billing.
 
@@ -8,7 +8,7 @@ The Demand Report calculates electrical demand (kW) over time periods by analyzi
 **Route:** `/demand_report`  
 **Data Source:** `meter_data` table
 
-## 🔑 Key Features
+## Key Features
 
 ### Report Types
 
@@ -33,7 +33,7 @@ The Demand Report calculates electrical demand (kW) over time periods by analyzi
 - **Interval:** Hourly or 15-minute
 - **Format:** DataTables or Excel export
 
-## 📊 Demand Calculation
+## Demand Calculation
 
 ### Demand Formula
 
@@ -82,7 +82,7 @@ if($total_intervaltime > 0) {
 - Demand charges can be 30-70% of electric bill
 - Reducing peak demand saves money
 
-## 📊 Query Logic
+## Query Logic
 
 ### Hourly Demand Query
 
@@ -150,7 +150,7 @@ if($max_wh_total == 0 || ($max_wh_total - $min_wh_total) == 0) {
 }
 ```
 
-## 📝 Report Output
+## Report Output
 
 ### Displayed Columns
 
@@ -175,7 +175,7 @@ if($kw_demand > 0) {
 
 Periods with zero demand are excluded from results.
 
-## 🔄 Usage Workflow
+## Usage Workflow
 
 ```mermaid
 sequenceDiagram
@@ -207,7 +207,7 @@ sequenceDiagram
     C-->>UI: Display in DataTables
 ```
 
-## ⚡ Performance
+## Performance
 
 ### Index Usage
 
@@ -234,7 +234,7 @@ ON meter_data(meter_id, location, datetime);
 - 15-minute: Best for ≤ 7 days
 - For longer periods, use hourly or daily aggregation
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Zero Demand Results
 
@@ -299,7 +299,7 @@ ORDER BY datetime
 LIMIT 20;
 ```
 
-## 📊 Usage Examples
+## Usage Examples
 
 ### Daily Peak Demand Analysis
 
@@ -347,7 +347,7 @@ ORDER BY kw_demand DESC
 LIMIT 1;
 ```
 
-## 💡 Best Practices
+## Best Practices
 
 ### Interval Selection
 
@@ -393,7 +393,7 @@ WHERE meter_id = ?
 AND hour BETWEEN ? AND ?;
 ```
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [Consumption Report](consumption-report.md) - Energy consumption (kWh)
 - [RAW Report](raw-report.md) - Detailed 15-min data with demand fields

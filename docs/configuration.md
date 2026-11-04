@@ -1,10 +1,10 @@
 # Configuration
 
-## 🔧 Overview
+## Overview
 
 CAMR configuration is managed through environment files, database settings, and administrative interfaces.
 
-## 📁 Configuration Files
+## Configuration Files
 
 ### .env File
 
@@ -37,7 +37,7 @@ SESSION_LIFETIME=120
 SESSION_DRIVER=file
 ```
 
-## 🏢 Company & Division
+## Company & Division
 
 **Tables:**
 - `meter_company_table` - Companies/tenants
@@ -50,7 +50,7 @@ SESSION_DRIVER=file
 - Report grouping
 - Access control
 
-## 📧 Email Configuration
+## Email Configuration
 
 **Purpose:**
 - New user credentials
@@ -72,7 +72,7 @@ MAIL_PASSWORD=app-specific-password
 MAIL_ENCRYPTION=tls
 ```
 
-## 🔧 Configuration Files (Meter)
+## Configuration Files (Meter)
 
 **Table:** `meter_configuration_file`
 
@@ -86,7 +86,7 @@ MAIL_ENCRYPTION=tls
 
 **Storage:** Gateway devices
 
-## 🌐 Web Settings
+## Web Settings
 
 **Table:** `web_page_settings`
 
@@ -97,7 +97,7 @@ MAIL_ENCRYPTION=tls
 - Footer text
 - Contact information
 
-## 🔐 Security Settings
+## Security Settings
 
 **Session:**
 - Timeout: 2 hours (configurable)

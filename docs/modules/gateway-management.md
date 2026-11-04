@@ -1,6 +1,6 @@
 # Gateway Management
 
-## 📡 Overview
+## Overview
 
 Gateway Management handles Remote Terminal Units (RTUs) that collect meter data and communicate with the central CAMR system. Gateways are physical devices deployed at sites that poll meters and transmit consumption data.
 
@@ -8,7 +8,7 @@ Gateway Management handles Remote Terminal Units (RTUs) that collect meter data 
 **Model:** `GatewayModel` (table: `meter_rtu`)  
 **Access:** Site Dashboard → Gateway Tab
 
-## 📊 Key Features
+## Key Features
 
 ### 1. Gateway Listing
 
@@ -42,9 +42,9 @@ if($last_log_update == "0000/00/00 00:00") {
 ```
 
 **Status Indicators:**
-- 🟢 **Online** - Cloud check icon, last update < 24 hours
-- 🔴 **Offline** - Cloud slash icon, offline for 1+ days
-- ⚫ **No Data** - No meters assigned or spare gateway
+- **Online** - Cloud check icon, last update < 24 hours
+- **Offline** - Cloud slash icon, offline for 1+ days
+- **No Data** - No meters assigned or spare gateway
 
 ### 3. Configuration Flags
 
@@ -176,7 +176,7 @@ if($alternate_address == '') {
 }
 ```
 
-## 🔄 Workflows
+## Workflows
 
 ### Gateway Registration Workflow
 
@@ -264,7 +264,7 @@ sequenceDiagram
     API->>DB: UPDATE update_rtu = 0
 ```
 
-## 📑 Database Schema
+## Database Schema
 
 ### Gateway Record Structure
 
@@ -326,7 +326,7 @@ AND (
 );
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Gateway Shows Offline
 
@@ -393,7 +393,7 @@ SELECT config_id FROM meter_configuration_file
 WHERE config_file = 'default.cfg';
 ```
 
-## ⚡ Performance Considerations
+## Performance Considerations
 
 ### Gateway Limitations
 
@@ -417,7 +417,7 @@ CREATE INDEX idx_last_log ON meter_rtu(last_log_update);
 CREATE UNIQUE INDEX idx_mac ON meter_rtu(gateway_mac);
 ```
 
-## 🔐 Security Considerations
+## Security Considerations
 
 ### MAC Address Authentication
 - Gateway API uses MAC address for authentication
@@ -429,7 +429,7 @@ CREATE UNIQUE INDEX idx_mac ON meter_rtu(gateway_mac);
 - Only enable for 3G/4G/5G gateways with VPN
 - Requires firewall rules and key management
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [Database Schema](../database-schema.md) - meter_rtu table
 - [Models](../models.md) - GatewayModel

@@ -1,10 +1,10 @@
-# 🔐 Authentication
+# Authentication
 
 The CAMR system implements a **session-based authentication** mechanism using Laravel's built-in session management. User credentials are validated against hashed passwords stored in the database, and authenticated sessions are maintained throughout the user's interaction with the system.
 
 ---
 
-## 📋 Overview
+## Overview
 
 **Controller:** `CAMRUserAuthController.php`  
 **Middleware:** `CAMRAuthCheck.php`, `CAMRAlreadyLoggedIn.php`  
@@ -16,7 +16,7 @@ The CAMR system implements a **session-based authentication** mechanism using La
 
 ---
 
-## 🔑 Key Components
+## Key Components
 
 ### Authentication Routes
 
@@ -51,7 +51,7 @@ Route::get('/site', [CAMRSiteController::class,'site'])
 
 ---
 
-## ⚙️ Login Process
+## Login Process
 
 ### Login Controller Method
 
@@ -91,7 +91,7 @@ public function loginUser(Request $request){
 
 ---
 
-## 🔄 Authentication Flow Diagram
+## Authentication Flow Diagram
 
 ```mermaid
 flowchart TB
@@ -129,7 +129,7 @@ flowchart TB
 
 ---
 
-## 🛡️ Middleware Protection
+## Middleware Protection
 
 ### CAMRAuthCheck Middleware
 
@@ -166,7 +166,7 @@ Prevents authenticated users from accessing login page:
 
 ---
 
-## 🚪 Logout Process
+## Logout Process
 
 ```php path=/Users/rli/Documents/DEC/camr_robinsons-main/camr_robinsons-main/app/Http/Controllers/CAMRUserAuthController.php start=46
 public function logout(){
@@ -188,7 +188,7 @@ public function logout(){
 
 ---
 
-## 🔒 Password Management
+## Password Management
 
 ### Password Hashing
 
@@ -231,7 +231,7 @@ Route::post('/reset-password', [EmailController::class, 'sendTemporaryPasswordto
 
 ---
 
-## 👤 User Model
+## User Model
 
 ```php path=/Users/rli/Documents/DEC/camr_robinsons-main/camr_robinsons-main/app/Models/User.php start=11
 class User extends Authenticatable
@@ -266,7 +266,7 @@ class User extends Authenticatable
 
 ---
 
-## 🔐 Session Management
+## Session Management
 
 ### Session Storage
 
@@ -305,39 +305,39 @@ public function index(){
 
 ---
 
-## ⚠️ Security Considerations
+## Security Considerations
 
 ### Current Implementation Strengths
 
-✅ **Password Hashing** - Bcrypt with automatic salting  
-✅ **Session-Based Auth** - No token exposure in URLs  
-✅ **Middleware Protection** - Consistent authentication checks  
-✅ **CSRF Protection** - Laravel's `VerifyCsrfToken` middleware active  
-✅ **Input Validation** - Username/password length requirements
+**Password Hashing** - Bcrypt with automatic salting  
+**Session-Based Auth** - No token exposure in URLs  
+**Middleware Protection** - Consistent authentication checks  
+**CSRF Protection** - Laravel's `VerifyCsrfToken` middleware active  
+**Input Validation** - Username/password length requirements
 
 ### Potential Improvements
 
-⚠️ **Rate Limiting**
+**Rate Limiting**
 ```php
 // Add throttle middleware to login route
 Route::post('login-user', [CAMRUserAuthController::class,'loginUser'])
     ->middleware('throttle:5,1'); // 5 attempts per minute
 ```
 
-⚠️ **Account Lockout**
+**Account Lockout**
 ```php
 // Track failed login attempts
 // Lock account after 5 consecutive failures
 // Require admin unlock or time-based unlock
 ```
 
-⚠️ **Two-Factor Authentication (2FA)**
+**Two-Factor Authentication (2FA)**
 ```php
 // Add OTP verification step after password validation
 // Send verification code via email or SMS
 ```
 
-⚠️ **Password Complexity Rules**
+**Password Complexity Rules**
 ```php
 $request->validate([
     'InputPassword' => [
@@ -351,7 +351,7 @@ $request->validate([
 ]);
 ```
 
-⚠️ **Session Timeout Warning**
+**Session Timeout Warning**
 ```javascript
 // Frontend JavaScript to warn users before session expires
 // Ping server to keep session alive during active use
@@ -359,7 +359,7 @@ $request->validate([
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Issue: "You Have to Login First" Loop
 
@@ -423,7 +423,7 @@ SESSION_DOMAIN=.robinsons-mall.com
 
 ---
 
-## 📊 Authentication Metrics
+## Authentication Metrics
 
 ### Tracking Login Activity
 
@@ -453,7 +453,7 @@ DB::table('failed_logins')->insert([
 
 ---
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Example 1: Standard Login
 
@@ -492,7 +492,7 @@ DB::table('failed_logins')->insert([
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - **[Site Access Control](site-access-control.md)** - User permissions per site
 - **[User Management](user-management.md)** - User CRUD operations
@@ -502,7 +502,7 @@ DB::table('failed_logins')->insert([
 
 ---
 
-## 📝 Best Practices
+## Best Practices
 
 ### For Developers
 

@@ -1,6 +1,6 @@
 # RAW Report
 
-## 📊 Overview
+## Overview
 
 The RAW Report extracts detailed meter data for a specific meter and time range. It provides all electrical parameters recorded by the gateway, including voltage, current, power, energy, and demand readings.
 
@@ -8,7 +8,7 @@ The RAW Report extracts detailed meter data for a specific meter and time range.
 **Route:** `/raw_report`  
 **Data Source:** `meter_data` table
 
-## 🔑 Key Features
+## Key Features
 
 ### Report Parameters
 
@@ -51,7 +51,7 @@ The RAW Report extracts detailed meter data for a specific meter and time range.
 - `soft_rev` (Software Revision)
 - `mac_addr` (Gateway MAC Address)
 
-## 📊 Query Logic
+## Query Logic
 
 ### Dynamic Column Selection
 
@@ -87,7 +87,7 @@ CREATE INDEX meter_data_index
 ON meter_data(meter_id, location, datetime);
 ```
 
-## 📝 Excel Export
+## Excel Export
 
 ### Export Process
 
@@ -132,7 +132,7 @@ $writer = new Xlsx($spreadSheet);
 $writer->save("RAW_Report_{$meter_id}_{$date}.xlsx");
 ```
 
-## 🔄 Usage Workflow
+## Usage Workflow
 
 ```mermaid
 sequenceDiagram
@@ -157,7 +157,7 @@ sequenceDiagram
     C-->>User: Download Excel file
 ```
 
-## ⚡ Performance
+## Performance
 
 ### Index Usage
 
@@ -190,7 +190,7 @@ ini_set('max_execution_time', 0); // No time limit
 ini_set('memory_limit', '512M');  // Increase memory
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### No Data Returned
 
@@ -247,7 +247,7 @@ LIMIT 1;
 3. **Too many rows** → Limit date range
 4. **PhpSpreadsheet missing** → Check composer dependencies
 
-## 📊 Usage Examples
+## Usage Examples
 
 ### Basic Energy Report
 
@@ -292,7 +292,7 @@ ORDER BY max_rec_kw_dmd DESC
 LIMIT 10;
 ```
 
-## 💡 Best Practices
+## Best Practices
 
 ### Date Range Selection
 
@@ -329,7 +329,7 @@ LIMIT 10;
 - Set 6 (Demand)
 - Peak demand analysis
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [SAP Report](sap-report.md) - Billing consumption
 - [Consumption Report](consumption-report.md) - Period analysis

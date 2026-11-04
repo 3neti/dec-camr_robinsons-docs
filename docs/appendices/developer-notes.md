@@ -4,7 +4,7 @@ This document provides essential information for developers maintaining, extendi
 
 ---
 
-## 🎯 Purpose
+## Purpose
 
 This document serves as:
 
@@ -16,7 +16,7 @@ This document serves as:
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ### MVC Pattern
 
@@ -77,7 +77,7 @@ protected static $logOnlyDirty = true;
 
 ---
 
-## 📚 Code Patterns & Conventions
+## Code Patterns & Conventions
 
 ### Naming Conventions
 
@@ -164,7 +164,7 @@ $request->validate([
 
 ---
 
-## ⚡ Performance Considerations
+## Performance Considerations
 
 ### N+1 Query Problem
 
@@ -238,7 +238,7 @@ CREATE INDEX idx_user_site_access ON user_site_access_table(user_id, site_id);
 
 ---
 
-## 🐛 Common Gotchas & Pitfalls
+## Common Gotchas & Pitfalls
 
 ### 1. Gateway API Routes
 
@@ -250,7 +250,7 @@ Route::get('/check_time.php', [CAMRGatewayDeviceController::class,'check_time'])
 Route::any('/lp/receive_file.php', [LoadProfileController::class,'LoadProfile']);
 ```
 
-**⚠️ Don't Refactor:** Gateway firmware expects these exact URLs. Changing them breaks gateway communication.
+**Don't Refactor:** Gateway firmware expects these exact URLs. Changing them breaks gateway communication.
 
 ### 2. WebPageSettingsModel Has No Primary Key
 
@@ -347,7 +347,7 @@ class ReportExport implements ShouldQueue { }
 
 ---
 
-## 🔧 Development Workflow
+## Development Workflow
 
 ### Local Development Setup
 
@@ -461,14 +461,14 @@ public function down()
 }
 ```
 
-**⚠️ Important:**
+**Important:**
 - Never delete migrations that have run in production
 - Always test both `up()` and `down()` methods
 - Add foreign key constraints for data integrity
 
 ---
 
-## 📝 Code Documentation Standards
+## Code Documentation Standards
 
 ### Controller Methods
 
@@ -518,7 +518,7 @@ public function calculateDemand($readings)
 
 ---
 
-## 🧪 Testing Strategies
+## Testing Strategies
 
 ### Manual Testing Checklist
 
@@ -570,7 +570,7 @@ php artisan tinker
 
 ---
 
-## 🚀 Deployment Guide
+## Deployment Guide
 
 ### Pre-Deployment Checklist
 
@@ -650,7 +650,7 @@ php artisan up
 
 ---
 
-## 🛡️ Security Best Practices
+## Security Best Practices
 
 ### Input Validation
 
@@ -721,7 +721,7 @@ $path = $request->file('csv_file')->store('uploads', 'local');
 
 ---
 
-## 📊 Performance Monitoring
+## Performance Monitoring
 
 ### Useful Debug Queries
 
@@ -758,7 +758,7 @@ Shows:
 
 ---
 
-## 📚 Recommended Reading
+## Recommended Reading
 
 ### Laravel Resources
 
@@ -779,7 +779,7 @@ Shows:
 
 ---
 
-## 🤝 Contributing Guidelines
+## Contributing Guidelines
 
 ### Code Style
 
@@ -818,7 +818,7 @@ Fixes #142
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Architecture](../architecture.md) - System design overview
 - [Database Schema](../database-schema.md) - Complete table reference
@@ -828,7 +828,7 @@ Fixes #142
 
 ---
 
-## 📝 Final Notes
+## Final Notes
 
 ### When in Doubt
 

@@ -1,10 +1,10 @@
-# 📧 Email Configuration
+# Email Configuration
 
 The CAMR system uses Laravel's **Mail** facade to send email notifications, primarily for password reset functionality. The system supports SMTP, Mailgun, Postmark, Amazon SES, and sendmail drivers.
 
 ---
 
-## 📋 Overview
+## Overview
 
 **Controller:** `EmailController.php`  
 **Mailable:** `ResetPassword.php` (app/Mail/)  
@@ -15,7 +15,7 @@ The CAMR system uses Laravel's **Mail** facade to send email notifications, prim
 
 ---
 
-## 🔑 SMTP Configuration
+## SMTP Configuration
 
 ### Environment Variables
 
@@ -43,7 +43,7 @@ MAIL_FROM_NAME="Centralized Automated Meter Reading"
 
 ---
 
-## ⚙️ Provider-Specific Setup
+## Provider-Specific Setup
 
 ### Gmail Configuration
 
@@ -118,7 +118,7 @@ Emails will be written to `storage/logs/laravel.log`
 
 ---
 
-## 📝 Email Implementation
+## Email Implementation
 
 ### EmailController
 
@@ -201,7 +201,7 @@ class ResetPassword extends Mailable
 
 ---
 
-## 💬 Email Content
+## Email Content
 
 ### Password Reset Email
 
@@ -226,7 +226,7 @@ CAMR System Administration
 
 ---
 
-## 🔄 Password Reset Workflow
+## Password Reset Workflow
 
 ```mermaid
 flowchart TB
@@ -268,7 +268,7 @@ flowchart TB
 
 ---
 
-## 🧪 Testing Email Configuration
+## Testing Email Configuration
 
 ### Test via Tinker
 
@@ -320,7 +320,7 @@ Look for email content in logs.
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Issue: "Failed to authenticate on SMTP server"
 
@@ -422,7 +422,7 @@ php artisan queue:work
 
 ---
 
-## 📊 Email Logging & Monitoring
+## Email Logging & Monitoring
 
 ### Log All Emails
 
@@ -456,16 +456,16 @@ Mail::failures(function($failures) {
 
 ---
 
-## 🔒 Security Best Practices
+## Security Best Practices
 
 ### 1. Use App Passwords
 
-❌ **Don't:**
+**Don't:**
 ```bash
 MAIL_PASSWORD=my_gmail_password
 ```
 
-✅ **Do:**
+**Do:**
 ```bash
 MAIL_PASSWORD=abcd efgh ijkl mnop  # App-specific password
 ```
@@ -507,7 +507,7 @@ $request->validate([
 
 ---
 
-## 📝 Production Configuration
+## Production Configuration
 
 ### Recommended Settings
 
@@ -554,7 +554,7 @@ stdout_logfile=/var/www/camr/storage/logs/queue-worker.log
 
 ---
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Example 1: User Forgot Password
 
@@ -578,7 +578,7 @@ stdout_logfile=/var/www/camr/storage/logs/queue-worker.log
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - **[Environment Setup](environment.md)** - Mail configuration variables
 - **[Authentication](../authentication.md)** - Password reset workflow

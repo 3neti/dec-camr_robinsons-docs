@@ -1,6 +1,6 @@
 # Site Management
 
-## 🏢 Overview
+## Overview
 
 Site Management is the core module for managing physical locations (malls, properties) where metering equipment is deployed. Each site contains gateways, meters, buildings, and meter locations organized in a hierarchical structure.
 
@@ -8,7 +8,7 @@ Site Management is the core module for managing physical locations (malls, prope
 **Route:** `/site`  
 **Model:** `SiteModel` (table: `meter_site`)
 
-## 📊 Site Dashboard
+## Site Dashboard
 
 The Site Dashboard provides a comprehensive view with 5 tabs:
 
@@ -31,7 +31,7 @@ SELECT
     COUNT(*) AS offline_meter WHERE DATEDIFF(NOW(), last_log_update) >= 1
 ```
 
-## 📝 Features
+## Features
 
 ### 1. Site List View
 
@@ -59,9 +59,9 @@ if($user_data->user_access == 'ALL') {
 ### 2. Online/Offline Status
 
 **Status Indicators:**
-- 🟢 **Online** - Last update within 24 hours (`DATEDIFF < 1`)
-- 🔴 **Offline** - No update for 1+ days
-- ⚫ **No Data** - `last_log_update = '0000-00-00 00:00:00'`
+- **Online** - Last update within 24 hours (`DATEDIFF < 1`)
+- **Offline** - No update for 1+ days
+- **No Data** - `last_log_update = '0000-00-00 00:00:00'`
 
 **Logic:**
 ```php path=/Users/rli/Documents/DEC/camr_robinsons-main/camr_robinsons-main/app/Http/Controllers/CAMRSiteController.php start=130
@@ -150,7 +150,7 @@ if($last_log_update == "0000/00/00 00:00") {
 - Add/Edit/Delete locations
 - Assign to buildings
 
-## 📊 Hierarchy Structure
+## Hierarchy Structure
 
 ```mermaid
 flowchart TB
@@ -177,7 +177,7 @@ flowchart TB
     style Meter fill:#27ae60,color:#fff
 ```
 
-## 🔄 Workflows
+## Workflows
 
 ### Create New Site Workflow
 
@@ -226,7 +226,7 @@ sequenceDiagram
     C-->>User: Render dashboard with tabs
 ```
 
-## 📑 Database Relations
+## Database Relations
 
 ### Site Record Structure
 
@@ -276,7 +276,7 @@ LEFT JOIN meter_company_table mct ON mct.company_id = ms.company_idx
 WHERE ms.site_id = ?
 ```
 
-## 👥 User Access Control
+## User Access Control
 
 ### Access Levels
 
@@ -308,7 +308,7 @@ if($user->user_access == 'ALL') {
 }
 ```
 
-## ⚠️ Important Notes
+## Important Notes
 
 1. **Site-Building Relationship:** Sites have a one-to-one relationship with a primary building
 2. **Status Calculation:** Based on `last_log_update` timestamp comparison
@@ -317,7 +317,7 @@ if($user->user_access == 'ALL') {
 5. **Soft Delete:** Sites use soft delete (varchar field, not Laravel's soft delete)
 6. **Activity Logging:** All site operations logged via Spatie ActivityLog
 
-## 📡 Related Features
+## Related Features
 
 ### From Site Dashboard
 
@@ -341,7 +341,7 @@ if($user->user_access == 'ALL') {
 - Organize by building
 - Assign equipment
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Site Shows Offline
 
@@ -379,7 +379,7 @@ WHERE user_idx = ? AND site_idx = ?;
 
 **Grant Access:** Add record to `user_access_group` table
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [Database Schema](../database-schema.md) - meter_site table
 - [Models](../models.md) - SiteModel

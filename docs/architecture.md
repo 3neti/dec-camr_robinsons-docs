@@ -1,10 +1,10 @@
-# 🏗️ Application Structure & Architecture
+# Application Structure & Architecture
 
 The CAMR (Centralized Automated Meter Reading) system follows a **three-tier architecture** with field devices (RTUs/meters), a centralized Laravel backend, and web-based frontend. This document provides a comprehensive overview of the application structure and architectural patterns.
 
 ---
 
-## 📋 System Overview
+## System Overview
 
 **Architecture Type:** Three-Tier (Presentation, Application, Data)  
 **Pattern:** MVC (Model-View-Controller)  
@@ -56,7 +56,7 @@ flowchart TB
 
 ---
 
-## 🗂️ Directory Structure
+## Directory Structure
 
 ### Laravel Application Root
 
@@ -156,7 +156,7 @@ camr_robinsons-main/
 
 ---
 
-## 🎯 MVC Architecture
+## MVC Architecture
 
 ### Model Layer
 
@@ -270,7 +270,7 @@ app/Http/Controllers/
 
 ---
 
-## 🔄 Request Lifecycle
+## Request Lifecycle
 
 ### Web Request Flow
 
@@ -314,7 +314,7 @@ flowchart TB
 
 ---
 
-## 🛡️ Security Architecture
+## Security Architecture
 
 ### Authentication Layer
 
@@ -376,7 +376,7 @@ flowchart TB
 
 ---
 
-## 📊 Data Architecture
+## Data Architecture
 
 ### Database Schema Overview
 
@@ -430,7 +430,7 @@ erDiagram
 
 ---
 
-## 🔌 Integration Architecture
+## Integration Architecture
 
 ### External Systems
 
@@ -474,7 +474,7 @@ flowchart LR
 
 ---
 
-## ⚡ Performance Architecture
+## Performance Architecture
 
 ### Caching Strategy
 
@@ -511,7 +511,7 @@ CREATE INDEX idx_user_site ON user_access_group(user_idx, site_idx);
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - **[Technology Stack](technology-stack.md)** - Detailed technology breakdown
 - **[Data Flow](data-flow.md)** - Data movement and processing

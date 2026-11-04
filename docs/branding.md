@@ -4,7 +4,7 @@ The **Custom Branding** feature enables complete visual customization of the CAM
 
 ---
 
-## 📋 Overview
+## Overview
 
 **Primary Interface:** Web Page Settings Modal (via `CAMRWebpageController.php`)  
 **Configuration Table:** `web_page_settings`  
@@ -31,7 +31,7 @@ Custom Branding in CAMR allows organizations to:
 
 ---
 
-## 🎨 Branding Components
+## Branding Components
 
 ### 1. Navigation Header Branding
 
@@ -205,7 +205,7 @@ $WebPageSettings->login_page_logo_width = 150;
 
 ---
 
-## 🔧 Implementation Guide
+## Implementation Guide
 
 ### Accessing Branding Settings
 
@@ -288,7 +288,7 @@ UPDATE web_page_settings SET
 
 ---
 
-## 📊 Branding Workflow
+## Branding Workflow
 
 ```mermaid
 flowchart TB
@@ -344,7 +344,7 @@ flowchart TB
 
 ---
 
-## 🎯 Real-World Branding Examples
+## Real-World Branding Examples
 
 ### Example 1: Robinsons Land Corporation
 
@@ -406,7 +406,7 @@ Logo File: utility_logo.png (500x500px, 320KB)
 
 ---
 
-## 🚨 Common Branding Issues
+## Common Branding Issues
 
 ### Issue 1: Logo Appears Pixelated or Blurry
 
@@ -587,7 +587,7 @@ if (!$is_valid_base64) {
 
 ---
 
-## ✅ Branding Best Practices
+## Branding Best Practices
 
 ### 1. Logo Design Specifications
 
@@ -685,15 +685,15 @@ mysql -u root -p -e "SELECT image_logo FROM meter_reading_robinsons.web_page_set
 
 | Device Type | Screen Size | Logo Clarity | Title Readable | Dimensions OK |
 |-------------|-------------|--------------|----------------|--------------|
-| Desktop (1920x1080) | Large | ✅ | ✅ | ✅ |
-| Laptop (1366x768) | Medium | ✅ | ✅ | ✅ |
-| Tablet (iPad) | Medium | ✅ | ✅ | ✅ |
-| Mobile (iPhone) | Small | ✅ | ✅ | Adjust |
-| Mobile (Android) | Small | ✅ | ✅ | Adjust |
+| Desktop (1920x1080) | Large | Yes | Yes | Yes |
+| Laptop (1366x768) | Medium | Yes | Yes | Yes |
+| Tablet (iPad) | Medium | Yes | Yes | Yes |
+| Mobile (iPhone) | Small | Yes | Yes | Adjust |
+| Mobile (Android) | Small | Yes | Yes | Adjust |
 
 ---
 
-## 📋 Branding Change Workflow
+## Branding Change Workflow
 
 ### Pre-Change Phase
 
@@ -722,7 +722,7 @@ mysql -u root -p -e "SELECT image_logo FROM meter_reading_robinsons.web_page_set
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Web Page Settings](web-settings.md) - Technical implementation details
 - [Configuration Files](configuration/config-files.md) - System configuration management
@@ -731,7 +731,7 @@ mysql -u root -p -e "SELECT image_logo FROM meter_reading_robinsons.web_page_set
 
 ---
 
-## 📝 Summary
+## Summary
 
 **Custom Branding** in CAMR Robinsons provides organizations with comprehensive control over the application's visual identity. The branding system uses base64-encoded logo storage in a centralized database table, enabling consistent brand application across all pages without file system dependencies.
 

@@ -1,6 +1,6 @@
 # Load Profile API
 
-## 📈 Overview
+## Overview
 
 The Load Profile API allows gateways to upload load profile data files (15-minute interval measurements) to the CAMR central system. Load profiles provide detailed time-series data showing electricity consumption patterns throughout the day.
 
@@ -8,7 +8,7 @@ The Load Profile API allows gateways to upload load profile data files (15-minut
 **Route:** `POST /lp/receive_file.php`  
 **Method:** POST (accepts any HTTP method via `Route::any()`)
 
-## 📊 What is a Load Profile?
+## What is a Load Profile?
 
 A **load profile** is a time-series dataset that shows electricity consumption at regular intervals (typically 15 minutes). It provides:
 
@@ -27,7 +27,7 @@ A **load profile** is a time-series dataset that shows electricity consumption a
 - `ch_7`: Reserved
 - `ch_8`: Reserved
 
-## 📡 API Endpoint
+## API Endpoint
 
 ### Upload Load Profile File
 
@@ -37,7 +37,7 @@ A **load profile** is a time-series dataset that shows electricity consumption a
 **Content-Type:** `multipart/form-data`  
 **Authentication:** None (gateway-initiated, identified by IP address)
 
-## 📝 Request Format
+## Request Format
 
 ### HTTP Request
 
@@ -85,7 +85,7 @@ meter_id,datetime,event_id,ch_1,ch_2,ch_3,ch_4,ch_5,ch_6,ch_7,ch_8
 - File extension must be `.csv` or `.txt`
 - File is required (validation error if missing)
 
-## 📊 CSV File Format
+## CSV File Format
 
 ### Expected Structure
 
@@ -124,7 +124,7 @@ meter_id,datetime,event_id,ch_1,ch_2,ch_3,ch_4,ch_5,ch_6,ch_7,ch_8
 - 01:00:00
 - ... (continues for 24 hours)
 
-## 📁 File Storage
+## File Storage
 
 ### Storage Location
 
@@ -174,7 +174,7 @@ if(!File::exists($path)) {
 
 > **Note:** Currently both values result in the same behavior - the file is saved and will overwrite any existing file with the same name.
 
-## ✅ Response
+## Response
 
 ### Success Response
 
@@ -218,7 +218,7 @@ The endpoint returns successfully if:
 }
 ```
 
-## 🔄 Gateway Upload Workflow
+## Gateway Upload Workflow
 
 Typical load profile collection and upload sequence:
 
@@ -264,7 +264,7 @@ sequenceDiagram
     end
 ```
 
-## 🐞 Data Processing
+## Data Processing
 
 ### Post-Upload Processing
 
@@ -299,7 +299,7 @@ See [Database Schema - load_profile table](../database-schema.md#load_profile) f
 3. Insert records into `load_profile` table
 4. Mark or move processed files
 
-## 📊 Use Cases
+## Use Cases
 
 ### 1. Scheduled Daily Collection
 
@@ -339,7 +339,7 @@ Gateway Action: Upload historical data
 3. Server organizes files by date automatically
 ```
 
-## ⚠️ Important Notes
+## Important Notes
 
 1. **No Authentication:** Endpoint is publicly accessible (no middleware)
 2. **File Validation Only:** Files are validated but not parsed/imported by this endpoint
@@ -350,7 +350,7 @@ Gateway Action: Upload historical data
 7. **File Naming:** Gateway determines filename (typically includes meter ID and date)
 8. **Storage Limits:** No size limits or quota checks implemented
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### File Upload Fails
 
@@ -391,7 +391,7 @@ tree storage/app/files/ -L 3
 find storage/app/files/ -type f -mtime -1
 ```
 
-## 🔧 Gateway Implementation Example
+## Gateway Implementation Example
 
 ### cURL Command
 
@@ -450,7 +450,7 @@ for csv_file in /data/load_profiles/*.csv; do
 done
 ```
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [Gateway Device API](gateway-device-api.md) - Force load profile endpoint
 - [Database Schema](../database-schema.md) - load_profile table

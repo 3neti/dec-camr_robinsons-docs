@@ -1,12 +1,12 @@
 # Site As-Built Report
 
-## 📊 Overview
+## Overview
 
 Infrastructure documentation showing all equipment and configuration.
 
 **Controller:** `SiteReportController.php`
 
-## 🔑 Features
+## Features
 
 - Gateway inventory
 - Meter inventory
@@ -15,7 +15,7 @@ Infrastructure documentation showing all equipment and configuration.
 - Network topology
 - Status indicators
 
-## 📝 Excel Structure
+## Excel Structure
 
 **Sheet 1: Gateways**
 - SN, MAC, IP

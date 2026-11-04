@@ -1,12 +1,12 @@
 # User Management & Authentication
 
-## 🔐 Overview
+## Overview
 
 Session-based authentication with role-based access control (RBAC).
 
 **Controllers:** `CAMRUserAuthController.php`, `UserController.php`
 
-## 📊 User Roles
+## User Roles
 
 ### Access Levels
 
@@ -15,7 +15,7 @@ Session-based authentication with role-based access control (RBAC).
 | **ALL** | All | Yes | Yes |
 | **Selected** | Assigned | No | Yes |
 
-## 🔑 Authentication
+## Authentication
 
 ### Login
 ```php
@@ -30,7 +30,7 @@ if(Hash::check($request->InputPassword, $user->user_password)) {
 - `loginID` - User ID
 - `site_current_tab` - Dashboard state
 
-## 📝 User Management
+## User Management
 
 ### Create User
 **Required:**
@@ -55,7 +55,7 @@ INSERT INTO user_access_group (user_idx, site_idx)
 VALUES (?, ?);
 ```
 
-## 🔐 Security
+## Security
 
 - **Hashing:** bcrypt
 - **Session:** 2-hour timeout

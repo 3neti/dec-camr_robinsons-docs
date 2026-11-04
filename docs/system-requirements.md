@@ -1,6 +1,6 @@
 # System Requirements
 
-## 🖥️ Server Requirements
+## Server Requirements
 
 ### PHP Requirements
 - **PHP Version:** 7.3+ or 8.0+
@@ -29,7 +29,7 @@
 - **Node.js:** 14+ (for asset compilation)
 - **NPM:** 6+
 
-## 💻 Development Environment
+## Development Environment
 
 ### Required Software
 - PHP 7.3+ / 8.0+
@@ -42,7 +42,7 @@
 - PHPStorm
 - VS Code with PHP extensions
 
-## 📦 Laravel Dependencies
+## Laravel Dependencies
 
 See `composer.json` for full list. Key packages:
 - Laravel Framework 8.x

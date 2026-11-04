@@ -1,13 +1,13 @@
 # Meter Location Management
 
-## 📍 Overview
+## Overview
 
 Meter Location Management handles EE (Electrical Equipment) rooms where meters are physically installed. Locations provide organizational structure within buildings.
 
 **Table:** `meter_location_table`  
 **Access:** Site Dashboard → Meter Location Tab
 
-## 🔑 Key Concepts
+## Key Concepts
 
 ### Location Hierarchy
 
@@ -26,7 +26,7 @@ Site
 - **Building Assignment** - Parent building
 - **Site Assignment** - Parent site
 
-## 📝 Features
+## Features
 
 ### 1. Create Location
 
@@ -66,7 +66,7 @@ Site
 - Number of meters
 - Status indicators
 
-## 🔄 Workflows
+## Workflows
 
 ### Create Location Workflow
 
@@ -108,7 +108,7 @@ flowchart TB
     style Meter fill:#27ae60,color:#fff
 ```
 
-## 📑 Database Schema
+## Database Schema
 
 ### meter_location_table Structure
 
@@ -149,7 +149,7 @@ GROUP BY mlt.location_id
 ORDER BY mlt.location_code;
 ```
 
-## 💡 Best Practices
+## Best Practices
 
 ### Naming Conventions
 
@@ -184,7 +184,7 @@ ORDER BY mlt.location_code;
 - By tenant area
 - By electrical system
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Cannot Create Location - Duplicate Code
 
@@ -224,7 +224,7 @@ WHERE location_idx = ?;
 3. Correct building selection
 4. Location not deleted
 
-## 📊 Usage Examples
+## Usage Examples
 
 ### Import CSV with Location Codes
 
@@ -253,7 +253,7 @@ JOIN meter_rtu mr
 WHERE mlt.location_code = 'GROUND-EE-ROOM';
 ```
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [Site Management](site-management.md) - Parent site context
 - [Building Management](building-management.md) - Parent building structure

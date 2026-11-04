@@ -4,7 +4,7 @@ This document tracks known issues, limitations, and quirks in the CAMR (Centrali
 
 ---
 
-## 📌 Overview
+## Overview
 
 **Purpose:** This page documents:
 
@@ -16,19 +16,19 @@ This document tracks known issues, limitations, and quirks in the CAMR (Centrali
 
 **Status Definitions:**
 
-- 🔴 **Open** - Issue exists, no fix planned yet
-- 🟡 **In Progress** - Fix is being developed
-- 🟢 **Workaround Available** - Temporary solution exists
-- 🔵 **By Design** - Intentional behavior, not a bug
-- ⚪ **Deferred** - Fix postponed to future release
+- **Open** - Issue exists, no fix planned yet
+- **In Progress** - Fix is being developed
+- **Workaround Available** - Temporary solution exists
+- **By Design** - Intentional behavior, not a bug
+- **Deferred** - Fix postponed to future release
 
 ---
 
-## 🗄️ Database & Data Issues
+## Database & Data Issues
 
 ### Issue #1: Load Profile Table Growing Rapidly
 
-**Status:** 🔵 By Design  
+**Status:** By Design  
 **Severity:** Medium  
 **Component:** Database / Load Profile Storage
 
@@ -70,7 +70,7 @@ OPTIMIZE TABLE meter_load_profile_table;
 
 ### Issue #2: No Automatic Data Retention Policy
 
-**Status:** 🔴 Open  
+**Status:** Open  
 **Severity:** Low  
 **Component:** Database Management
 
@@ -136,7 +136,7 @@ protected function schedule(Schedule $schedule)
 
 ### Issue #3: Orphaned Meters After Gateway Deletion
 
-**Status:** 🟢 Workaround Available  
+**Status:** Workaround Available  
 **Severity:** Medium  
 **Component:** Gateway Management / Data Integrity
 
@@ -188,11 +188,11 @@ public function delete_gateway_confirmed(Request $request)
 
 ---
 
-## 🔌 Gateway & Device Issues
+## Gateway & Device Issues
 
 ### Issue #4: Gateway Offline Detection Delay
 
-**Status:** 🔵 By Design  
+**Status:** By Design  
 **Severity:** Low  
 **Component:** Gateway Monitoring
 
@@ -242,7 +242,7 @@ protected function schedule(Schedule $schedule)
 
 ### Issue #5: CSV Update Flag Not Auto-Resetting
 
-**Status:** 🟢 Workaround Available  
+**Status:** Workaround Available  
 **Severity:** Low  
 **Component:** Gateway Configuration Update
 
@@ -284,7 +284,7 @@ $schedule->call(function() {
 
 ### Issue #6: Load Profile Upload Size Limit
 
-**Status:** 🔵 By Design  
+**Status:** By Design  
 **Severity:** Medium  
 **Component:** Load Profile API
 
@@ -326,11 +326,11 @@ php -i | grep -E "upload_max_filesize|post_max_size|max_execution_time"
 
 ---
 
-## 📊 Report Generation Issues
+## Report Generation Issues
 
 ### Issue #7: SAP Report Missing Partial Hour Data
 
-**Status:** 🔵 By Design  
+**Status:** By Design  
 **Severity:** Low  
 **Component:** SAP Report Generation
 
@@ -359,7 +359,7 @@ Query full hour ranges:
 
 ### Issue #8: Excel Export Memory Exhaustion with Large Datasets
 
-**Status:** 🟢 Workaround Available  
+**Status:** Workaround Available  
 **Severity:** High  
 **Component:** Report Export / Excel Generation
 
@@ -407,7 +407,7 @@ return Excel::download(new LargeReportExport($filters), 'report.xlsx', \Maatwebs
 
 ### Issue #9: Report Generation Blocks Web Server
 
-**Status:** ⚪ Deferred  
+**Status:** Deferred  
 **Severity:** Medium  
 **Component:** Report Generation / Performance
 
@@ -458,11 +458,11 @@ user=www-data
 
 ---
 
-## 🔐 Security & Authentication Issues
+## Security & Authentication Issues
 
 ### Issue #10: No Multi-Factor Authentication (MFA)
 
-**Status:** 🔴 Open  
+**Status:** Open  
 **Severity:** Medium  
 **Component:** Authentication
 
@@ -504,7 +504,7 @@ Implement Laravel 2FA packages like `pragmarx/google2fa-laravel`
 
 ### Issue #11: Session Timeout Too Short
 
-**Status:** 🟢 Workaround Available  
+**Status:** Workaround Available  
 **Severity:** Low  
 **Component:** Session Management
 
@@ -532,7 +532,7 @@ SESSION_LIFETIME=480  # 8 hours
 
 ### Issue #12: Password Reset Email Contains Plain-Text Password
 
-**Status:** 🔵 By Design  
+**Status:** By Design  
 **Severity:** Medium  
 **Component:** Password Reset / Email Security
 
@@ -571,11 +571,11 @@ Instruct users to:
 
 ---
 
-## 🐛 UI/UX Issues
+## UI/UX Issues
 
 ### Issue #13: DataTables Not Persisting Page State
 
-**Status:** ⚪ Deferred  
+**Status:** Deferred  
 **Severity:** Low  
 **Component:** UI / DataTables
 
@@ -605,7 +605,7 @@ $('#meterTable').DataTable({
 
 ### Issue #14: No Bulk Operations for Meters
 
-**Status:** 🔴 Open  
+**Status:** Open  
 **Severity:** Medium  
 **Component:** Meter Management / UI
 
@@ -648,7 +648,7 @@ php artisan tinker
 
 ### Issue #15: Mobile Responsiveness Issues
 
-**Status:** 🔴 Open  
+**Status:** Open  
 **Severity:** Low  
 **Component:** UI / Responsive Design
 
@@ -682,11 +682,11 @@ Implement mobile-first redesign with responsive DataTables configuration.
 
 ---
 
-## 🛠️ System Limitations
+## System Limitations
 
 ### Limitation #1: Single Database Server Only
 
-**Status:** 🔵 By Design  
+**Status:** By Design  
 **Component:** Architecture
 
 **Description:**
@@ -707,7 +707,7 @@ No built-in support for database replication, clustering, or read replicas. Syst
 
 ### Limitation #2: No Real-Time Dashboard Updates
 
-**Status:** 🔵 By Design  
+**Status:** By Design  
 **Component:** Dashboard / WebSocket
 
 **Description:**
@@ -734,7 +734,7 @@ setInterval(function() {
 
 ### Limitation #3: Maximum 15-Minute Reading Interval
 
-**Status:** 🔵 By Design  
+**Status:** By Design  
 **Component:** Data Collection
 
 **Description:**
@@ -753,7 +753,7 @@ System designed for 15-minute interval readings. Higher frequency (1-minute, 5-m
 
 ---
 
-## 📝 Reporting Issues
+## Reporting Issues
 
 When reporting a new issue, please include:
 
@@ -771,7 +771,7 @@ When reporting a new issue, please include:
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Troubleshooting Guide](troubleshooting.md) - Common problems and solutions
 - [Installation Guide](../installation.md) - Setup and configuration
@@ -780,7 +780,7 @@ When reporting a new issue, please include:
 
 ---
 
-## 📝 Summary
+## Summary
 
 This document tracks known issues and limitations in CAMR Robinsons. Issues are categorized by severity and status, with workarounds provided where available.
 

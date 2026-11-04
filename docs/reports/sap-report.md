@@ -1,6 +1,6 @@
 # SAP Report
 
-## 📊 Overview
+## Overview
 
 The SAP Report generates billing-ready consumption data formatted for SAP system integration. It calculates current consumption, compares with previous month, and exports to Excel format.
 
@@ -8,7 +8,7 @@ The SAP Report generates billing-ready consumption data formatted for SAP system
 **Route:** `/sap_report`  
 **Template:** `public/template/SAP.xlsx`
 
-## 🔑 Key Features
+## Key Features
 
 ### Report Parameters
 
@@ -41,7 +41,7 @@ $past_two_months = date('Y-m-d', strtotime($_end_date. ' - 2 months'));
 $past_two_months_date = "$past_two_months 10:14:59";
 ```
 
-## 📊 Report Calculation
+## Report Calculation
 
 ### Query Logic
 
@@ -108,7 +108,7 @@ if($current_reading != $prev_reading) {
 }
 ```
 
-## 📝 Excel Export
+## Excel Export
 
 ### Template Structure
 
@@ -148,7 +148,7 @@ $writer = new Xlsx($spreadSheet);
 $writer->save("SAP_Report_{$building_code}_{$date}.xlsx");
 ```
 
-## 🔄 Usage Workflow
+## Usage Workflow
 
 ```mermaid
 sequenceDiagram
@@ -177,7 +177,7 @@ sequenceDiagram
     C-->>User: Download Excel file
 ```
 
-## ⚡ Performance
+## Performance
 
 ### Index Usage
 
@@ -197,7 +197,7 @@ ON meter_data(location, meter_id, datetime);
 - Index critical for performance with large datasets
 - `max_execution_time` set to 0 for Excel export
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Zero Consumption
 

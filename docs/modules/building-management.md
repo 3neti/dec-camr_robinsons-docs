@@ -1,6 +1,6 @@
 # Building Management
 
-## 🏢 Overview
+## Overview
 
 Building Management organizes sites into logical building structures. Buildings are subdivisions within a site that group meter locations and equipment.
 
@@ -8,7 +8,7 @@ Building Management organizes sites into logical building structures. Buildings 
 **Model:** `BuildingModel` (table: `meter_building_table`)  
 **Access:** Site Dashboard → Building Tab
 
-## 🔑 Key Concepts
+## Key Concepts
 
 ### Building Hierarchy
 
@@ -28,7 +28,7 @@ Site
 - **Cut-off Day** - Billing cycle day (stored in primary building record)
 - **Network Configuration** - IP settings (stored in primary building record)
 
-## 📝 Features
+## Features
 
 ### 1. View Buildings
 
@@ -131,7 +131,7 @@ public function delete_building_confirmed(Request $request) {
 - Should check for meters before deletion
 - Best practice: Remove all child records first
 
-## 🔄 Workflows
+## Workflows
 
 ### Create Building Workflow
 
@@ -179,7 +179,7 @@ sequenceDiagram
     C-->>UI: "Building Information Successfully Updated!"
 ```
 
-## 📑 Database Schema
+## Database Schema
 
 ### meter_building_table Structure
 
@@ -236,7 +236,7 @@ GROUP BY mbt.id
 ORDER BY mbt.building_code;
 ```
 
-## 💡 Best Practices
+## Best Practices
 
 ### Naming Conventions
 
@@ -270,7 +270,7 @@ ORDER BY mbt.building_code;
 - **Single Building:** Small sites, one electrical system
 - **Multiple Buildings:** Large complexes, separate structures
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Cannot Create Building - Duplicate Code
 
@@ -326,7 +326,7 @@ WHERE building_id = ?;
 3. Building not deleted
 4. Refresh accordion view
 
-## 📊 Usage Examples
+## Usage Examples
 
 ### Multi-Building Site Setup
 
@@ -374,7 +374,7 @@ WHERE ms.site_id = ?
 ORDER BY mbt2.building_code, mlt.location_code;
 ```
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [Site Management](site-management.md) - Parent site context
 - [Meter Location Management](meter-location-management.md) - Child locations

@@ -1,10 +1,10 @@
-# 📄 Configuration Files
+# Configuration Files
 
 The CAMR system uses **Modbus configuration files** to define communication parameters for different meter models. These configuration files specify register addresses, data types, and parsing rules for extracting meter readings from Modbus-compliant energy meters.
 
 ---
 
-## 📋 Overview
+## Overview
 
 **Controller:** `ConfigurationFileController.php`  
 **Model:** `ConfigurationFileModel.php`  
@@ -15,7 +15,7 @@ The CAMR system uses **Modbus configuration files** to define communication para
 
 ---
 
-## 🔑 Database Structure
+## Database Structure
 
 ### meter_configuration_file Table
 
@@ -33,7 +33,7 @@ The CAMR system uses **Modbus configuration files** to define communication para
 
 ---
 
-## ⚙️ Configuration File Management
+## Configuration File Management
 
 ### Controller Implementation
 
@@ -112,11 +112,11 @@ public function delete_configuration_file_confirmed(Request $request){
 }
 ```
 
-**⚠️ Warning:** Deleting a configuration file may break meters that reference it.
+**Warning:** Deleting a configuration file may break meters that reference it.
 
 ---
 
-## 📊 DataTables Integration
+## DataTables Integration
 
 ```php path=/Users/rli/Documents/DEC/camr_robinsons-main/camr_robinsons-main/app/Http/Controllers/ConfigurationFileController.php start=36
 public function getConfigurationFileList(Request $request)
@@ -159,7 +159,7 @@ public function getConfigurationFileList(Request $request)
 
 ---
 
-## 📝 Modbus Configuration File Format
+## Modbus Configuration File Format
 
 ### Example Configuration File
 
@@ -205,7 +205,7 @@ Register,Data Type,Description,Unit,Multiplier
 
 ---
 
-## 🔌 Integration with Meters
+## Integration with Meters
 
 ### Assigning Configuration to Meter
 
@@ -253,7 +253,7 @@ store_reading(meter_id, 'active_energy_import', energy_kwh)
 
 ---
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Example 1: Adding New Meter Model
 
@@ -320,7 +320,7 @@ store_reading(meter_id, 'active_energy_import', energy_kwh)
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Issue: Meter Not Reading Data
 
@@ -386,7 +386,7 @@ DELETE FROM meter_configuration_file WHERE config_id = 3;
 
 ---
 
-## 📊 Configuration File Reports
+## Configuration File Reports
 
 ### Query: Meters by Configuration File
 
@@ -430,7 +430,7 @@ GROUP BY c.config_id, c.config_file, c.meter_model;
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - **[Meter Management](../modules/meter-management.md)** - Assigning configuration files to meters
 - **[Gateway Device API](../api/gateway-device-api.md)** - How gateways use configuration files
@@ -439,7 +439,7 @@ GROUP BY c.config_id, c.config_file, c.meter_model;
 
 ---
 
-## 📝 Best Practices
+## Best Practices
 
 ### For Administrators
 

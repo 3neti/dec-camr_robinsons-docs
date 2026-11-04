@@ -1,10 +1,10 @@
-# 🏢 Company & Division
+# Company & Division
 
 The CAMR system uses a hierarchical **organizational structure** to manage multiple companies, divisions, and sites. Companies represent parent organizations, Divisions represent business units within companies, and Sites represent physical properties/buildings.
 
 ---
 
-## 📋 Overview
+## Overview
 
 **Controllers:** `CompanyController.php`, `DivisionController.php`  
 **Models:** `CompanyModel.php`, `DivisionModel.php`  
@@ -23,7 +23,7 @@ Company (Robinson's Land Corporation)
 
 ---
 
-## 🔑 Company Management
+## Company Management
 
 ### Database Structure
 
@@ -118,11 +118,11 @@ public function delete_company_confirmed(Request $request){
 }
 ```
 
-**⚠️ Warning:** Deleting a company will cascade to divisions and sites if foreign key constraints are configured.
+**Warning:** Deleting a company will cascade to divisions and sites if foreign key constraints are configured.
 
 ---
 
-## 🏭 Division Management
+## Division Management
 
 ### Database Structure
 
@@ -223,7 +223,7 @@ public function delete_division_confirmed(Request $request){
 
 ---
 
-## 📊 DataTables Integration
+## DataTables Integration
 
 ### Company List DataTable
 
@@ -278,7 +278,7 @@ Similar implementation with both `division_code` and `division_name` columns.
 
 ---
 
-## 🔗 Integration with Site Management
+## Integration with Site Management
 
 ### Site Creation Workflow
 
@@ -307,7 +307,7 @@ $site->save();
 
 ---
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Example 1: Setup New Organization
 
@@ -371,7 +371,7 @@ $site->save();
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Issue: Cannot Delete Company
 
@@ -413,7 +413,7 @@ DELETE FROM meter_company_table WHERE company_id = 1;
 
 ---
 
-## 📊 Organizational Reports
+## Organizational Reports
 
 ### Query: Sites by Company
 
@@ -467,7 +467,7 @@ ORDER BY c.company_name, d.division_code, b.building_code;
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - **[Site Management](../modules/site-management.md)** - Site creation and hierarchy
 - **[Database Schema](../database-schema.md)** - Company and division table structures
@@ -476,7 +476,7 @@ ORDER BY c.company_name, d.division_code, b.building_code;
 
 ---
 
-## 📝 Best Practices
+## Best Practices
 
 ### For Administrators
 

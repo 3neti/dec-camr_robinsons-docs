@@ -1,10 +1,10 @@
 # Eloquent Models
 
-## 📋 Overview
+## Overview
 
 The CAMR system uses Laravel's Eloquent ORM for database interactions. All models extend `Illuminate\Database\Eloquent\Model` and implement activity logging using the Spatie Laravel ActivityLog package.
 
-## 🏛️ Model Architecture
+## Model Architecture
 
 All models (except `User`) share common characteristics:
 - **Activity Logging:** Uses `LogsActivity` trait from Spatie
@@ -40,7 +40,7 @@ class ExampleModel extends Model
 }
 ```
 
-## 🏢 Core Infrastructure Models
+## Core Infrastructure Models
 
 ### SiteModel
 
@@ -203,7 +203,7 @@ Represents meter locations (EE rooms) within buildings.
 // hasMany(MeterModel::class, 'location_idx', 'location_id')
 ```
 
-## 🏛️ Organization Models
+## Organization Models
 
 ### CompanyModel
 
@@ -247,7 +247,7 @@ Represents divisions within companies.
 // hasMany(SiteModel::class, 'division_idx', 'division_id')
 ```
 
-## 👤 User Models
+## User Models
 
 ### User
 
@@ -290,7 +290,7 @@ Authentication model extending Laravel's `Authenticatable`.
 **Table:** `user_access_group`  
 **Purpose:** User-site access mapping (many-to-many)
 
-## ⚙️ Configuration Models
+## Configuration Models
 
 ### ConfigurationFileModel
 
@@ -312,7 +312,7 @@ Web interface customization settings.
 
 **Purpose:** Logo, header title, navigation customization
 
-## 📊 Data Models
+## Data Models
 
 ### MeterDataModel
 
@@ -326,7 +326,7 @@ Time-series meter reading data.
 
 **Note:** This table grows continuously. Consider archival strategy.
 
-## 🔗 Relationships Summary
+## Relationships Summary
 
 ### Hierarchy
 ```
@@ -370,7 +370,7 @@ public function meters()
 }
 ```
 
-## 📋 Activity Logging
+## Activity Logging
 
 All models use **Spatie Laravel ActivityLog** for audit trails.
 
@@ -404,7 +404,7 @@ WHERE subject_type = 'App\\Models\\SiteModel'
 ORDER BY created_at DESC;
 ```
 
-## 🛠️ Usage Examples
+## Usage Examples
 
 ### Creating a Site
 
@@ -440,7 +440,7 @@ $meters = MeterModel::where('rtu_idx', $gatewayId)->get();
 $site = SiteModel::with(['meters', 'gateways'])->find($id);
 ```
 
-## 🐛 Common Patterns
+## Common Patterns
 
 ### Soft Deletes
 
@@ -459,7 +459,7 @@ Foreign keys use `_idx` suffix:
 - `rtu_idx` → references `rtu_id`
 - `company_idx` → references `company_id`
 
-## ⚠️ Important Notes
+## Important Notes
 
 1. **No Explicit Relationships:** Models don't define Eloquent relationships. Joins are done manually in controllers.
 2. **Session-Based User Tracking:** Uses `Session::get('loginID')` instead of `Auth::id()`
@@ -467,7 +467,7 @@ Foreign keys use `_idx` suffix:
 4. **Mass Assignment Protection:** Only fields in `$fillable` can be mass-assigned
 5. **Primary Keys:** All use auto-incrementing integer IDs with `_id` suffix
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [Database Schema](database-schema.md) - Complete table structures
 - [Site Management](modules/site-management.md) - Using SiteModel

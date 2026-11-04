@@ -1,6 +1,6 @@
 # Installation Guide
 
-## 📥 Prerequisites
+## Prerequisites
 
 Before installing CAMR Robinsons, ensure your system meets the following requirements:
 
@@ -31,7 +31,7 @@ Required extensions:
 - cURL
 - GD or Imagick
 
-## 🚀 Installation Steps
+## Installation Steps
 
 ### Step 1: Clone or Extract the Repository
 
@@ -253,7 +253,7 @@ Create symbolic link for public file storage:
 php artisan storage:link
 ```
 
-## 🌐 Web Server Configuration
+## Web Server Configuration
 
 ### Apache Configuration
 
@@ -324,7 +324,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-## 🔒 Security Configuration
+## Security Configuration
 
 ### SSL/HTTPS Setup (Recommended for Production)
 
@@ -351,7 +351,7 @@ sudo ufw allow 3306/tcp       # MySQL (only if remote access needed)
 sudo ufw enable
 ```
 
-## 📊 Post-Installation Setup
+## Post-Installation Setup
 
 ### 1. Login to the System
 
@@ -397,7 +397,7 @@ Navigate to:
    - Meter Location (EE Room)
    - Configuration file
 
-## 🔧 Maintenance Commands
+## Maintenance Commands
 
 ### Clear Application Cache
 
@@ -435,7 +435,7 @@ php artisan config:cache
 php artisan route:cache
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Issue: "No application encryption key has been specified"
 
@@ -468,7 +468,7 @@ chown -R www-data:www-data storage bootstrap/cache
    - Apache: `/var/log/apache2/error.log`
    - Nginx: `/var/log/nginx/error.log`
 
-## 📝 Environment-Specific Notes
+## Environment-Specific Notes
 
 ### Development Environment
 
@@ -494,7 +494,7 @@ DB_HOST=your-production-db-host
 5. Implement firewall rules
 6. Regular security updates
 
-## ✅ Verification Checklist
+## Verification Checklist
 
 - [ ] PHP version 7.3+ installed
 - [ ] MySQL 5.7+ installed and running
